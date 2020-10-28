@@ -15,6 +15,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#define _GNU_SOURCE
+
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,6 +32,35 @@
 #include "config.h"
 
 #define RECEIVE_PACKET_SIZE 1500
+
+// May be thread-unsafe because I use inet_ntoa
+
+// Returned value must be disposed of by free()
+static char *display_address(const struct sockaddr_in *packet_source)
+{
+	char *packet_source_string = NULL;
+	int ret = 0;
+
+	if (packet_source->sin_family != AF_INET) {
+		ret = asprintf( &packet_source_string, "(weird src_addr family %ld)", (long int) packet_source->sin_family);
+	} else {
+		char *source_ip = inet_ntoa(packet_source->sin_addr);
+		uint16_t source_port = ntohs(packet_source->sin_port);
+
+		ret = asprintf( &packet_source_string, "%s:%d", source_ip, (int) source_port);
+	}
+
+	if (ret == -1)
+		return NULL;
+
+	return packet_source_string;
+}
+
+static void dump_incoming_packet(FILE *stream, const struct sockaddr_in *packet_source, const char *received_packet, const size_t received_packet_size)
+{
+	fprintf(stream, "%s\n", display_address(packet_source));
+	fwrite(received_packet, received_packet_size, 1, stream);
+}
 
 // TODO: use malloc()
 char received_packet[RECEIVE_PACKET_SIZE];
@@ -65,20 +96,18 @@ int main()
 		struct sockaddr_in src_addr;
 		socklen_t src_addr_size;
 
-		src_addr_size = sizeof(src_addr);
-
 		/* man socket:
 		 * SOCK_DGRAM  and  SOCK_RAW sockets allow sending of datagrams to
 		 * correspondents named in sendto(2) calls.  Datagrams are generally
 		 * received with recvfrom(2), which returns the next datagram along
 		 * with the address of its sender.
 		 */
+
+		src_addr_size = sizeof(src_addr);
 		ret = recvfrom(udp_socket, received_packet, sizeof(received_packet), 0,
                         (struct sockaddr *) &src_addr, &src_addr_size);
 
-		// TODO: remember to check value of ret
-
-		fwrite(received_packet, ret, 1, stdout);
+		dump_incoming_packet(stdout, &src_addr, received_packet, ret);
 	}
 
 	close(udp_socket);
