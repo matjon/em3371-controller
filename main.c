@@ -58,7 +58,10 @@ static char *display_address(const struct sockaddr_in *packet_source)
 
 static void dump_incoming_packet(FILE *stream, const struct sockaddr_in *packet_source, const char *received_packet, const size_t received_packet_size)
 {
-	fprintf(stream, "%s\n", display_address(packet_source));
+	char *packet_source_text = display_address(packet_source);
+	fprintf(stream, "%s\n", packet_source_text);
+	free(packet_source_text);
+
 	fwrite(received_packet, received_packet_size, 1, stream);
 }
 
