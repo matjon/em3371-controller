@@ -1,0 +1,4 @@
+
+#define CONFIG_BIND_ADDRESS "0.0.0.0"
+#define CONFIG_BIND_PORT 1234
+
