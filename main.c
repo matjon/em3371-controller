@@ -15,8 +15,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#define _GNU_SOURCE
-#define _POSIX_C_SOURCE
+#include "config.h"
+#include "main.h"
+#include "meteo_sp73.h"
 
 #include <ctype.h>
 #include <errno.h>
@@ -33,9 +34,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-#include "config.h"
 
-#define RECEIVE_PACKET_SIZE 1500
 
 
 // May be thread-unsafe because I use inet_ntoa
@@ -104,7 +103,7 @@ void hexdump_buffer(FILE *stream, const char *buffer, size_t buffer_size, const 
 	}
 }
 
-static void dump_incoming_packet(FILE *stream, const struct sockaddr_in *packet_source, const char *received_packet, const size_t received_packet_size)
+void dump_incoming_packet(FILE *stream, const struct sockaddr_in *packet_source, const char *received_packet, const size_t received_packet_size)
 {
 	char *packet_source_text = packet_source_to_string(packet_source);
 	char current_time[30];
@@ -117,7 +116,7 @@ static void dump_incoming_packet(FILE *stream, const struct sockaddr_in *packet_
 }
 
 
-static int reply_to_ping_packet(int udp_socket, const struct sockaddr_in *packet_source, const char *received_packet, const size_t received_packet_size)
+int reply_to_ping_packet(int udp_socket, const struct sockaddr_in *packet_source, const char *received_packet, const size_t received_packet_size)
 {
 	long int ret = 0;
 	fputs("Handling the received packet as a ping packet, sending it back\n", stderr);
@@ -136,20 +135,6 @@ static int reply_to_ping_packet(int udp_socket, const struct sockaddr_in *packet
 }
 
 
-// Implements main program logic
-static void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_source, const char *received_packet, const size_t received_packet_size)
-{
-
-	dump_incoming_packet(stderr, packet_source, received_packet, received_packet_size);
-
-#if defined(CONFIG_REPLY_TO_PING_PACKETS) && (CONFIG_REPLY_TO_PING_PACKETS == 1)
-	// See description in config.h
-	// TODO: check the contents of the packet, not just its size
-	if (received_packet_size < 20) {
-		reply_to_ping_packet(udp_socket, packet_source, received_packet, received_packet_size);
-	}
-#endif
-}
 
 
 int main()
