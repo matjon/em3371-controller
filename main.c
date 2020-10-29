@@ -116,6 +116,42 @@ static void dump_incoming_packet(FILE *stream, const struct sockaddr_in *packet_
 	free(packet_source_text);
 }
 
+
+static int reply_to_ping_packet(int udp_socket, const struct sockaddr_in *packet_source, const char *received_packet, const size_t received_packet_size)
+{
+	long int ret = 0;
+	fputs("Handling the received packet as a ping packet, sending it back\n", stderr);
+	ret = sendto(udp_socket, received_packet, received_packet_size, 0,
+			(const struct sockaddr*) packet_source, sizeof(*packet_source));
+
+	if (ret != (long int)received_packet_size) {
+		if (ret == -1) {
+			perror("Cannot reply to a ping packet");
+		} else {
+			fprintf(stderr, "Problem with reply to a ping packet: tried to send %ld bytes, sent %ld bytes.\n", (long int) received_packet_size, ret);
+		}
+		return -1;
+	}
+	return 0;
+}
+
+
+// Implements main program logic
+static void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_source, const char *received_packet, const size_t received_packet_size)
+{
+
+	dump_incoming_packet(stderr, packet_source, received_packet, received_packet_size);
+
+#if defined(CONFIG_REPLY_TO_PING_PACKETS) && (CONFIG_REPLY_TO_PING_PACKETS == 1)
+	// See description in config.h
+	// TODO: check the contents of the packet, not just its size
+	if (received_packet_size < 20) {
+		reply_to_ping_packet(udp_socket, packet_source, received_packet, received_packet_size);
+	}
+#endif
+}
+
+
 int main()
 {
 	tzset();
@@ -167,7 +203,12 @@ int main()
 		ret = recvfrom(udp_socket, received_packet, RECEIVE_PACKET_SIZE, 0,
                         (struct sockaddr *) &src_addr, &src_addr_size);
 
-		dump_incoming_packet(stdout, &src_addr, received_packet, ret);
+		if (ret == -1) {
+			perror("recvfrom failed");
+			// We continue anyway
+		} else {
+			process_incoming_packet(udp_socket, &src_addr, received_packet, ret);
+		}
 	}
 
 	free(received_packet);
