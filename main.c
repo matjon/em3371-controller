@@ -39,7 +39,7 @@
 // May be thread-unsafe because I use inet_ntoa
 
 // Returned value must be disposed of by free()
-static char *display_address(const struct sockaddr_in *packet_source)
+static char *packet_source_to_string(const struct sockaddr_in *packet_source)
 {
 	char *packet_source_string = NULL;
 	int ret = 0;
@@ -74,7 +74,7 @@ void current_time_to_string(char *time_out, char buffer_size)
 
 static void dump_incoming_packet(FILE *stream, const struct sockaddr_in *packet_source, const char *received_packet, const size_t received_packet_size)
 {
-	char *packet_source_text = display_address(packet_source);
+	char *packet_source_text = packet_source_to_string(packet_source);
 	char current_time[30];
 	current_time_to_string(current_time, sizeof(current_time));
 
