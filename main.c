@@ -116,9 +116,6 @@ static void dump_incoming_packet(FILE *stream, const struct sockaddr_in *packet_
 	free(packet_source_text);
 }
 
-// TODO: use malloc()
-char received_packet[RECEIVE_PACKET_SIZE];
-
 int main()
 {
 	tzset();
@@ -148,6 +145,13 @@ int main()
 		abort();
 	}
 
+	char *received_packet = malloc(RECEIVE_PACKET_SIZE);
+	if (received_packet == NULL) {
+		perror("Cannot allocate memory");
+		abort();
+	}
+
+	// TODO: implement proper program termination
 	while (1) {
 		struct sockaddr_in src_addr;
 		socklen_t src_addr_size;
@@ -160,12 +164,13 @@ int main()
 		 */
 
 		src_addr_size = sizeof(src_addr);
-		ret = recvfrom(udp_socket, received_packet, sizeof(received_packet), 0,
+		ret = recvfrom(udp_socket, received_packet, RECEIVE_PACKET_SIZE, 0,
                         (struct sockaddr *) &src_addr, &src_addr_size);
 
 		dump_incoming_packet(stdout, &src_addr, received_packet, ret);
 	}
 
+	free(received_packet);
 	close(udp_socket);
 
 	return 0;
