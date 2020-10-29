@@ -16,11 +16,14 @@
 */
 
 #define _GNU_SOURCE
+#define _POSIX_C_SOURCE
 
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/ip.h>
@@ -56,13 +59,29 @@ static char *display_address(const struct sockaddr_in *packet_source)
 	return packet_source_string;
 }
 
+// It is advisable to call tzset() at the beginning of program
+// Displays a local time converted to a string
+void current_time_to_string(char *time_out, char buffer_size)
+{
+	time_t current_time = time(NULL);
+	struct tm current_time_tm;
+
+	localtime_r(&current_time, &current_time_tm);
+
+	// Time should be in a format that LibreOffice is able to understand
+	strftime(time_out, buffer_size, "%Y-%m-%d %H:%M:%S", &current_time_tm);
+}
+
 static void dump_incoming_packet(FILE *stream, const struct sockaddr_in *packet_source, const char *received_packet, const size_t received_packet_size)
 {
 	char *packet_source_text = display_address(packet_source);
-	fprintf(stream, "%s\n", packet_source_text);
-	free(packet_source_text);
+	char current_time[30];
+	current_time_to_string(current_time, sizeof(current_time));
+
+	fprintf(stream, "%s received a packet from %s :\n", current_time, packet_source_text);
 
 	fwrite(received_packet, received_packet_size, 1, stream);
+	free(packet_source_text);
 }
 
 // TODO: use malloc()
@@ -70,6 +89,8 @@ char received_packet[RECEIVE_PACKET_SIZE];
 
 int main()
 {
+	tzset();
+
 	int ret = 0;
 
 	int udp_socket = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
