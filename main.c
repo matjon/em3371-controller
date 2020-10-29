@@ -18,6 +18,7 @@
 #define _GNU_SOURCE
 #define _POSIX_C_SOURCE
 
+#include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,8 +37,8 @@
 
 #define RECEIVE_PACKET_SIZE 1500
 
-// May be thread-unsafe because I use inet_ntoa
 
+// May be thread-unsafe because I use inet_ntoa
 // Returned value must be disposed of by free()
 static char *packet_source_to_string(const struct sockaddr_in *packet_source)
 {
@@ -72,6 +73,37 @@ void current_time_to_string(char *time_out, char buffer_size)
 	strftime(time_out, buffer_size, "%Y-%m-%d %H:%M:%S", &current_time_tm);
 }
 
+void hexdump_buffer(FILE *stream, const char *buffer, size_t buffer_size, const int bytes_per_line)
+{
+	// TODO: make the function more readable
+	// TODO: replace fprintf with something faster, like sprintf
+	for (size_t i = 0; i < buffer_size; i+=bytes_per_line) {
+		fprintf(stream, "%08x  ", (unsigned int) i);
+
+		for (size_t j = i; j < i + bytes_per_line && j < buffer_size; j++) {
+			fprintf(stream, "%02x ", (unsigned int) buffer[j]);
+		}
+		// last line padding
+		for (size_t j = buffer_size; j < i + bytes_per_line; j++) {
+			fputs("   ", stream);
+		}
+
+		fprintf(stream, " |");
+		for (size_t j = i; j < i+bytes_per_line && j < buffer_size; j++) {
+			if (isprint(buffer[j])) {
+				fputc(buffer[j], stream);
+			} else {
+				fputc('.', stream);
+			}
+		}
+		// last line padding
+		for (size_t j = buffer_size; j < i+bytes_per_line; j++) {
+			fputs(" ", stream);
+		}
+		fprintf(stream, "|\n");
+	}
+}
+
 static void dump_incoming_packet(FILE *stream, const struct sockaddr_in *packet_source, const char *received_packet, const size_t received_packet_size)
 {
 	char *packet_source_text = packet_source_to_string(packet_source);
@@ -80,7 +112,7 @@ static void dump_incoming_packet(FILE *stream, const struct sockaddr_in *packet_
 
 	fprintf(stream, "%s received a packet from %s :\n", current_time, packet_source_text);
 
-	fwrite(received_packet, received_packet_size, 1, stream);
+	hexdump_buffer(stream, received_packet, received_packet_size, 8);
 	free(packet_source_text);
 }
 
