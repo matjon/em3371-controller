@@ -72,7 +72,7 @@ void current_time_to_string(char *time_out, char buffer_size)
 	strftime(time_out, buffer_size, "%Y-%m-%d %H:%M:%S", &current_time_tm);
 }
 
-void hexdump_buffer(FILE *stream, const char *buffer, size_t buffer_size, const int bytes_per_line)
+void hexdump_buffer(FILE *stream, const unsigned char *buffer, size_t buffer_size, const int bytes_per_line)
 {
 	// TODO: make the function more readable
 	// TODO: replace fprintf with something faster, like sprintf
@@ -103,7 +103,7 @@ void hexdump_buffer(FILE *stream, const char *buffer, size_t buffer_size, const 
 	}
 }
 
-void dump_incoming_packet(FILE *stream, const struct sockaddr_in *packet_source, const char *received_packet, const size_t received_packet_size)
+void dump_incoming_packet(FILE *stream, const struct sockaddr_in *packet_source, const unsigned char *received_packet, const size_t received_packet_size)
 {
 	char *packet_source_text = packet_source_to_string(packet_source);
 	char current_time[30];
@@ -116,7 +116,7 @@ void dump_incoming_packet(FILE *stream, const struct sockaddr_in *packet_source,
 }
 
 
-int reply_to_ping_packet(int udp_socket, const struct sockaddr_in *packet_source, const char *received_packet, const size_t received_packet_size)
+int reply_to_ping_packet(int udp_socket, const struct sockaddr_in *packet_source, const unsigned char *received_packet, const size_t received_packet_size)
 {
 	long int ret = 0;
 	fputs("Handling the received packet as a ping packet, sending it back\n", stderr);
@@ -166,7 +166,7 @@ int main()
 		abort();
 	}
 
-	char *received_packet = malloc(RECEIVE_PACKET_SIZE);
+	unsigned char *received_packet = malloc(RECEIVE_PACKET_SIZE);
 	if (received_packet == NULL) {
 		perror("Cannot allocate memory");
 		abort();
