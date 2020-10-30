@@ -143,7 +143,9 @@ int main()
 
 	int ret = 0;
 
-	int udp_socket = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+        // TODO: set SOCK_CLOEXEC. Setting in in call to socket() does not
+        // work on some DD-WRT routers.
+	int udp_socket = socket(AF_INET, SOCK_DGRAM, 0);
 	if (udp_socket == -1) {
 		perror("Cannot create socket");
 		abort();
