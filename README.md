@@ -32,8 +32,8 @@ I therefore used `toolchain-mipsel_gcc-linaro_uClibc-0.9.32`, which works correc
 
 ## TODO
 
-- log file saving and rotation (for limited space),
 - CSV output,
+- implement log file saving and rotation (for limited space),
 - runtime configuration, via a config file or command line parameters,
 - write proper README.md,
 - display time in local timezone on DD-WRT (if it's easy),
@@ -41,3 +41,4 @@ I therefore used `toolchain-mipsel_gcc-linaro_uClibc-0.9.32`, which works correc
     - devise a more accurate formula to calculate temperature from raw data,
     - describe how `historical1` and `historical2` in `device_single_sensor_data` behaves,
     - decode other bytes in the packets,
+- use a Makefile instead of compile.sh
