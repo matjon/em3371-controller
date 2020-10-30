@@ -1,3 +1,31 @@
+Data logger for WiFi weather stations: Meteo SP73 and GreenBlue GB522
+=====================================================================
+
+A program to receive and decode network traffic from WiFi-enabled weather
+stations: Meteo SP73 and GreenBlue GB522.
+
+Program do przetwarzania danych wysyłanych przez stację pogody Meteo SP73.
+Ta stacja pogody jest prawie identyczna z wyglądu do stacji pogody GreenBlue
+GB522.
+Stacje Meteo SP73 oraz GreenBlue GB522 wyglądają identycznie, poza logotypami
+marki.
+
+Program działa pod kontrolą Linuksa, w tym także DD-WRT. Powinien zadziałać bez
+problemu na Raspberry Pi. Nie był testowany na OpenWRT, jednak nie powinno być
+większych problemów z uruchomieniem go tam.
+
+Przeniesienie na Windowsa (przy użyciu MinGW) wymagałoby pewnej ilości pracy,
+jednak z użyciem biblioteki Gnulib mogłoby być stosunkowo proste.
+
+Program jest oparty na pracy wykonanej przez Pana Łukasza Kalamłackiego, który
+wykonał analizę wsteczną protokołu stacji:
+http://kalamlacki.eu/sp73.php
+
+## Opis konfiguracji stacji
+
+Do zrobienia: opis konfiguracji stacji - zmiany docelowego adresu, do którego
+są wysyłane dane.
+
 ## Compilation for DD-WRT
 
 It is necessary to use a toolchain that links code with the C library used in the DD-WRT build,
@@ -33,12 +61,15 @@ I therefore used `toolchain-mipsel_gcc-linaro_uClibc-0.9.32`, which works correc
 ## TODO
 
 - CSV output,
-- implement log file saving and rotation (for limited space),
+- implement log file saving and rotation (useful on devices with limited storage space),
 - runtime configuration, via a config file or command line parameters,
 - write proper README.md,
-- display time in local timezone on DD-WRT (if it's easy),
+- display time in local timezone on DD-WRT (may be difficult),
 - reverse engineering:
     - devise a more accurate formula to calculate temperature from raw data,
-    - describe how `historical1` and `historical2` in `device_single_sensor_data` behaves,
-    - decode other bytes in the packets,
+    - describe how `historical1` and `historical2` in `device_single_sensor_data` behave,
+    - decode other bytes in packets sent by the device,
 - use a Makefile instead of compile.sh
+- Windows port
+    - probably the best approach would be to use Gnulib:
+            https://www.gnu.org/software/gnulib/
