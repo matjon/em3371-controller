@@ -155,13 +155,13 @@ int main()
 	int udp_socket = socket(AF_INET, SOCK_DGRAM, 0);
 	if (udp_socket == -1) {
 		perror("Cannot create socket");
-		abort();
+		exit(1);
 	}
 
 	struct in_addr bind_address;
 	if (! inet_aton(CONFIG_BIND_ADDRESS, &bind_address)) {
 		puts("Incorrect CONFIG_BIND_ADDRESS defined in config.h\n");
-		abort();
+		exit(1);
 	}
 	struct sockaddr_in bind_sockaddr = {
 		.sin_family = AF_INET,
@@ -172,13 +172,13 @@ int main()
 	ret = bind(udp_socket, (struct sockaddr *) &bind_sockaddr, sizeof(bind_sockaddr));
 	if (ret == -1) {
 		perror("Cannot bind socket");
-		abort();
+		exit(1);
 	}
 
 	unsigned char *received_packet = malloc(RECEIVE_PACKET_SIZE);
 	if (received_packet == NULL) {
 		perror("Cannot allocate memory");
-		abort();
+		exit(1);
 	}
 
 	// TODO: implement proper program termination
