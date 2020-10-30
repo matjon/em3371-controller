@@ -126,8 +126,6 @@ void display_single_sensor_json(FILE *stream, const struct device_single_sensor_
 	fprintf(stream, "\n  }");
 }
 
-// This is for debugging purposes. I did not take care to handle proper comma presence
-// in all cases.
 void display_sensor_state_json(FILE *stream, const struct device_sensor_state *state)
 {
 	fputs("{ ", stream);
