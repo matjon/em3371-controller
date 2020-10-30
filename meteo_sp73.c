@@ -208,6 +208,7 @@ void display_sensor_state_CSV(FILE *stream, const struct device_sensor_state *st
 
 void init_logging()
 {
+        fprintf(stderr, "Output formats are subject to change\n");
         display_CSV_header(stdout);
 }
 
