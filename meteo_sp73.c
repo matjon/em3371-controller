@@ -164,6 +164,54 @@ void display_sensor_state_json(FILE *stream, const struct device_sensor_state *s
 	fprintf(stream, "\n}\n");
 }
 
+void display_CSV_header(FILE *stream)
+{
+        fputs("time;atmospheric_pressure;"
+                "station_temp;station_temp_raw;station_humidity;"
+                "sensor1_temp;sensor1_temp_raw;sensor1_humidity;"
+                "sensor2_temp;sensor2_temp_raw;sensor2_humidity;"
+                "sensor3_temp;sensor3_temp_raw;sensor3_humidity;"
+                "\n", stream);
+}
+
+void display_single_measurement_CSV(FILE *stream, const struct device_single_measurement *state)
+{
+        if (DEVICE_IS_INCORRECT_TEMPERATURE(state->temperature)) {
+                fprintf(stream, ";;");
+        } else {
+		fprintf(stream, "%.2f;%d;",
+			(double) state->temperature, (int) state->raw_temperature
+                        );
+        }
+
+        if (state->humidity == DEVICE_INCORRECT_HUMIDITY) {
+                fprintf(stream, ";");
+        } else {
+		fprintf(stream, "%d;", (int) state->humidity);
+        }
+}
+
+void display_sensor_state_CSV(FILE *stream, const struct device_sensor_state *state)
+{
+	char current_time[30];
+	current_time_to_string(current_time, sizeof(current_time));
+
+        fprintf(stream, "%s;%d;", current_time, state->atmospheric_pressure);
+        display_single_measurement_CSV(stream, &(state->station_sensor.current));
+
+        for (int i=0; i < 3; i++) {
+                display_single_measurement_CSV(stream, &(state->remote_sensors[i].current));
+        }
+
+        fprintf(stream, "\n");
+}
+
+void init_logging()
+{
+        display_CSV_header(stdout);
+}
+
+
 // Main program logic
 void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_source,
 		const unsigned char *received_packet, const size_t received_packet_size)
@@ -188,6 +236,7 @@ void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_so
 
 		decode_sensor_state(sensor_state, received_packet, received_packet_size);
 		display_sensor_state_json(stderr, sensor_state);
+		display_sensor_state_CSV(stdout, sensor_state);
 
 		free(sensor_state);
 	}

@@ -181,6 +181,8 @@ int main()
 		exit(1);
 	}
 
+        init_logging();
+
 	// TODO: implement proper program termination
 	while (1) {
 		struct sockaddr_in src_addr;
