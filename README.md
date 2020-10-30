@@ -76,3 +76,4 @@ I therefore used `toolchain-mipsel_gcc-linaro_uClibc-0.9.32`, which works correc
     - probably the best approach would be to use Gnulib:
             https://www.gnu.org/software/gnulib/
 - maybe some refactoring,
+- document the protocol used by the weather station,
