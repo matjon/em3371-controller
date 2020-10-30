@@ -26,6 +26,8 @@ http://kalamlacki.eu/sp73.php
 Do zrobienia: opis konfiguracji stacji - zmiany docelowego adresu, do którego
 są wysyłane dane.
 
+Formaty wyjścia programu mogą się zmienić w przyszłej wersji.
+
 ## Compilation for DD-WRT
 
 It is necessary to use a toolchain that links code with the C library used in the DD-WRT build,
@@ -60,8 +62,8 @@ I therefore used `toolchain-mipsel_gcc-linaro_uClibc-0.9.32`, which works correc
 
 ## TODO
 
-- CSV output,
 - implement log file saving and rotation (useful on devices with limited storage space),
+    - using `logrotate` could be easier and better, however,
 - runtime configuration, via a config file or command line parameters,
 - write proper README.md,
 - display time in local timezone on DD-WRT (may be difficult),
@@ -73,3 +75,4 @@ I therefore used `toolchain-mipsel_gcc-linaro_uClibc-0.9.32`, which works correc
 - Windows port
     - probably the best approach would be to use Gnulib:
             https://www.gnu.org/software/gnulib/
+- maybe some refactoring,
