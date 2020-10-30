@@ -106,6 +106,10 @@ void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_so
 
 		struct device_sensor_state *sensor_state;
 		sensor_state = malloc(sizeof(struct device_sensor_state));
+                if (sensor_state == NULL){
+		        fprintf(stderr, "process_incoming_packet: Cannot allocate memory!\n");
+                        return;
+                }
 
 		decode_sensor_state(sensor_state, received_packet, received_packet_size);
 
