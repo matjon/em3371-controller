@@ -26,7 +26,7 @@ http://kalamlacki.eu/sp73.php
 Do zrobienia: opis konfiguracji stacji - zmiany docelowego adresu, do którego
 są wysyłane dane.
 
-Formaty wyjścia programu mogą się zmienić w przyszłej wersji.
+Formaty wyjścia programu (JSON, CSV) mogą się zmienić w przyszłej wersji.
 
 ## Compilation for DD-WRT
 
@@ -71,6 +71,8 @@ I therefore used `toolchain-mipsel_gcc-linaro_uClibc-0.9.32`, which works correc
     - devise a more accurate formula to calculate temperature from raw data,
     - describe how `historical1` and `historical2` in `device_single_sensor_data` behave,
     - decode other bytes in packets sent by the device,
+    Some versions of the weather station are described to contain a DCF77 time
+    receiver.
 - use a Makefile instead of compile.sh
 - Windows port
     - probably the best approach would be to use Gnulib:
