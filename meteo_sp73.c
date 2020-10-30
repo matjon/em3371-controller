@@ -30,7 +30,7 @@ bool decode_single_measurement(struct device_single_measurement *measurement,
 		fprintf(stderr, "Weird: measurement contains humidity, but not temperature.\n");
 	} else {
 		// Trying to be endianness-agnostic
-		int raw_temperature = raw_data[0] + ((int)raw_data[1]) * 256;
+		uint16_t raw_temperature = raw_data[0] + ((int)raw_data[1]) * 256;
 		measurement->raw_temperature = raw_temperature;
 
 		// The reverse engineering documentation contains the following formula for
