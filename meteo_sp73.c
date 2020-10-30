@@ -155,7 +155,7 @@ void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_so
 	dump_incoming_packet(stderr, packet_source, received_packet, received_packet_size);
 
 	if (received_packet_size < 20) {
-#if defined(CONFIG_REPLY_TO_PING_PACKETS) && (CONFIG_REPLY_TO_PING_PACKETS == 1)
+#ifdef CONFIG_REPLY_TO_PING_PACKETS
 	// See description in config.h
 	// TODO: check the contents of the packet, not just its size
 		reply_to_ping_packet(udp_socket, packet_source,

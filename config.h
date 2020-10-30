@@ -10,10 +10,10 @@
  * so that the weather station will send long packets later.
  *
  * This variable controls whether to send short ping packets back.
- * It should normally be enabled (set to 1), except in cases
+ * It should normally be enabled (defined), except in cases
  * when packets are duplicated to another computer using
  * e.g. the TEE target from iptables.
  * In this case, this knob should be enabled only on one of the computers
- * so that the device would not be confused.
+ * so that the weather station would not be confused.
  */
-#define CONFIG_REPLY_TO_PING_PACKETS 1
+#define CONFIG_REPLY_TO_PING_PACKETS
