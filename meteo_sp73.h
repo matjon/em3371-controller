@@ -8,6 +8,7 @@
 #endif
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/ip.h>
@@ -17,13 +18,13 @@ struct device_single_measurement {
 	float temperature;
 	// Raw temperature as sent by the device - for reverse engineering
 	uint16_t raw_temperature;
-	short unsigned int humidity;
+	uint16_t humidity;
 };
 
-//I prever not to use NaNs because of possible portability issues across architectures.
+//I prefer not to use NaNs because of possible portability issues across architectures.
 #define DEVICE_INCORRECT_TEMPERATURE -999.0
 #define DEVICE_IS_INCORRECT_TEMPERATURE(x) (x < -990.0)
-#define DEVICE_INCORRECT_HUMIDITY -1
+#define DEVICE_INCORRECT_HUMIDITY UINT16_MAX
 
 struct device_single_sensor_data {
 	bool any_data_present;
@@ -45,10 +46,10 @@ struct device_sensor_state {
 	struct device_single_sensor_data station_sensor;
 	struct device_single_sensor_data remote_sensors[3];
 	// As reported by an internal sensor in the weather station
-	unsigned int atmospheric_pressure;
+	uint16_t atmospheric_pressure;
 };
-#define DEVICE_INCORRECT_PRESSURE -1
+#define DEVICE_INCORRECT_PRESSURE UINT16_MAX
 
 
-void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_source, 
+void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_source,
 		const unsigned char *received_packet, const size_t received_packet_size);
