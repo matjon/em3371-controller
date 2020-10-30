@@ -29,3 +29,10 @@ the following message in dmesg:
 
 This problem occured with `toolchain-mipsel_gcc4.1.2` even with this command line parameter.
 I therefore used `toolchain-mipsel_gcc-linaro_uClibc-0.9.32`, which works correctly.
+
+
+## TODO
+
+- runtime configuration, via a config file or command line parameters,
+
+- write README.md,
