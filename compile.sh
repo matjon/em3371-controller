@@ -4,6 +4,9 @@ COMMON_PARAMETERS="-std=gnu99 -Wall -Wextra"
 
 gcc $COMMON_PARAMETERS $SOURCES -o ${OUTPUT_BASE}
 
+gcc $COMMON_PARAMETERS psychrometrics.c psychrometrics_test.c -o psychrometrics_test -lm
+
+
 # Compilation for DD-WRT - see:
 #https://github.com/mirror/dd-wrt/blob/master/src/router/Makefile.brcm26
 #https://github.com/mirror/dd-wrt/blob/master/src/router/configs/buildscripts/build_broadcom_K26.sh
@@ -17,6 +20,13 @@ mipsel-linux-uclibc-gcc                                         \
         -fno-caller-saves  -mno-branch-likely -msoft-float      \
         $COMMON_PARAMETERS                                      \
         $SOURCES -o ${OUTPUT_BASE}_mipsel
+
+mipsel-linux-uclibc-gcc                                         \
+        -DBCMWPA2 -O2 -pipe -mips32 -mtune=mips32               \
+        -fno-caller-saves  -mno-branch-likely -msoft-float      \
+        $COMMON_PARAMETERS                                      \
+        psychrometrics.c psychrometrics_test.c                  \
+        -o psychrometrics_test_mipsel -lm
 
 # Additional possible GCC parameters: -minterlink-mips16 -mips16
 
