@@ -13,12 +13,12 @@ GB522.
 Stacje Meteo SP73 oraz GreenBlue GB522 wyglądają identycznie, poza logotypami
 marki.
 
-Program działa pod kontrolą Linuksa, w tym także DD-WRT. Powinien zadziałać bez
-problemu na Raspberry Pi. Nie był testowany na OpenWRT, jednak nie powinno być
-większych problemów z uruchomieniem go tam.
+Program działa pod kontrolą GNU/Linuksa, w tym także DD-WRT. Powinien zadziałać
+bez problemu na Raspberry Pi. Nie był testowany na OpenWRT, jednak dostosowanie
+go do tego środowiska powinno być proste.
 
 Przeniesienie na Windowsa (przy użyciu MinGW) wymagałoby pewnej ilości pracy,
-jednak z użyciem biblioteki Gnulib mogłoby być stosunkowo proste.
+jednak z użyciem biblioteki Gnulib też mogłoby być stosunkowo proste.
 
 Program jest oparty na pracy wykonanej przez Pana Łukasza Kalamłackiego, który
 wykonał analizę wsteczną protokołu stacji:
@@ -37,10 +37,11 @@ Formaty wyjścia programu (JSON, CSV) mogą się zmienić w przyszłej wersji.
 ## Compilation for DD-WRT
 
 It is necessary to use a toolchain that links code with the C library used in the DD-WRT build,
-which frequently is uClibc. Cross compilers supplied with the distribution usually generate code for
-GNU libc and so the program compiled with them may not work.
+which frequently is uClibc. Cross compilers supplied with Linux distributions
+usually generate code for GNU libc and so the program compiled with them may
+not work.
 
-The compilers for DD-WRT can be downloaded from 
+Compilers for DD-WRT can be obtained from
         https://dd-wrt.com/support/other-downloads/
 path `toolchains/toolchains.tar.xz`. It is a large download, but only a part of it will be needed
 --- it is not necessary to decompress the whole file.
@@ -49,7 +50,7 @@ It is not straightforward to determine which toolchain to use and also required 
 parameters of GCC. Some hints:
 
 1. Login via SSH and check `/proc/cpuinfo` and top of `dmesg`. This will tell the architecture and
-   the version of the compiler that was used to build the kernel.
+   version of the compiler that was used to build the kernel.
 2. Look at the DD-WRT source code and build scripts on https://github.com/mirror/dd-wrt/ .
    The source code is unfortunately messy and it is not easy to determine which build scripts are
    really used and which are just leftovers sitting idly in the repository.
