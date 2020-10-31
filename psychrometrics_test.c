@@ -67,6 +67,7 @@ int main()
 {
         fprintf(stdout, "Small differences are normal as there is some variability in formulas\n");
         fprintf(stdout, "especially at temperatures below 0°C.\n");
+        // and values are rounded to 1°F
 
         fprintf(stdout, "Reference values from diagram, less reliable:\n");
         // Reference values are from chart at
