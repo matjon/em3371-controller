@@ -16,6 +16,7 @@
  */
 
 #include "psychrometrics.h"
+#include <math.h>
 #include <stdio.h>
 #include <sys/time.h>
 
@@ -97,6 +98,10 @@ int main()
         print_dew_point(fahrenheit_to_celcius(93), 93, fahrenheit_to_celcius(91));
 
         dew_point_calculation_benchmarks();
+
+        fprintf(stdout, "Should display \"nan\" and possibly an error message\n");
+
+        print_dew_point( 10, 0, nan(""));
 
         return 0;
 }
