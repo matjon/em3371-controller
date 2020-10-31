@@ -17,12 +17,6 @@
 
 #pragma once
 
-#ifndef _GNU_SOURCE
-# define _GNU_SOURCE
-#endif
-#ifndef _POSIX_C_SOURCE
-# define _POSIX_C_SOURCE
-#endif
 
 #include <stdio.h>
 #include <sys/types.h>
