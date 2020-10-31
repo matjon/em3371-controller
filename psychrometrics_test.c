@@ -39,6 +39,8 @@ void dew_point_calculation_benchmarks()
         struct timeval start;
         struct timeval end;
 
+        fprintf(stderr, "Starting a benchmark\n");
+
         gettimeofday(&start, NULL);
 
         for (int i = 0; i < 100; i++) {
@@ -64,9 +66,9 @@ void dew_point_calculation_benchmarks()
 int main()
 {
         fprintf(stdout, "Small differences are normal as there is some variability in formulas\n");
-        fprintf(stdout, "especially at temperatures below freezing.\n");
+        fprintf(stdout, "especially at temperatures below 0°C.\n");
 
-        fprintf(stdout, "Reference values read from diagram, less reliable:\n");
+        fprintf(stdout, "Reference values from diagram, less reliable:\n");
         // Reference values are from chart at
         //      https://upload.wikimedia.org/wikipedia/commons/9/9d/PsychrometricChart.SeaLevel.SI.svg
         print_dew_point(30, 60, 21.5);
@@ -74,7 +76,7 @@ int main()
         print_dew_point(-5, 70, -10);
 
 
-        fprintf(stdout, "Reference values read from table:\n");
+        fprintf(stdout, "Reference values from table:\n");
         // Values from
         //      https://www.nwcg.gov/publications/pms437/weather/temp-rh-dp-tables#TOC-Dry-Bulb-Temp-41-60
         print_dew_point(fahrenheit_to_celcius(36), 38, fahrenheit_to_celcius(13));
