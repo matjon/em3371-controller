@@ -21,6 +21,8 @@
 
 #include <ctype.h>
 #include <errno.h>
+#include <signal.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -35,7 +37,8 @@
 #include <unistd.h>
 
 
-
+volatile bool stop_execution = false;
+volatile int stop_execution_signal = 0;
 
 // May be thread-unsafe because I use inet_ntoa
 // Returned value must be disposed of by free()
@@ -195,8 +198,33 @@ int reply_to_ping_packet(int udp_socket, const struct sockaddr_in *packet_source
 	return 0;
 }
 
+void on_interrupt(int signum)
+{
+        stop_execution = true;
+        stop_execution_signal = signum;
+}
 
+void init_signals()
+{
+        sigset_t signal_mask;
+        sigemptyset(&signal_mask);
 
+        struct sigaction signal_action = {
+                .sa_handler = on_interrupt,
+                .sa_mask = signal_mask,
+                .sa_flags = 0,
+                .sa_restorer = NULL,
+        };
+
+#define INSTALL_SIGNAL(signame) \
+        if (sigaction(signame, &signal_action, NULL) != 0) {            \
+                perror("sigaction failed for " #signame );              \
+        }
+
+        INSTALL_SIGNAL(SIGTERM)
+        INSTALL_SIGNAL(SIGHUP)
+        INSTALL_SIGNAL(SIGINT)
+}
 
 int main()
 {
@@ -236,9 +264,9 @@ int main()
 	}
 
         init_logging();
+        init_signals();
 
-	// TODO: implement proper program termination
-	while (1) {
+	while (stop_execution == false) {
 		struct sockaddr_in src_addr;
 		socklen_t src_addr_size;
 
@@ -254,12 +282,16 @@ int main()
                         (struct sockaddr *) &src_addr, &src_addr_size);
 
 		if (ret == -1) {
-			perror("recvfrom failed");
+                        if (errno != EINTR) {
+                                perror("recvfrom failed");
+                        }
 			// We continue anyway
 		} else {
 			process_incoming_packet(udp_socket, &src_addr, received_packet, ret);
 		}
 	}
+
+        fprintf(stderr, "Received signal %d, terminating\n", stop_execution_signal);
 
 	free(received_packet);
 	close(udp_socket);
