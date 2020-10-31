@@ -4,6 +4,9 @@ Data logger for WiFi weather stations: Meteo SP73 and GreenBlue GB522
 A program to receive and decode network traffic from WiFi-enabled weather
 stations: Meteo SP73 and GreenBlue GB522.
 
+Notice: this program is neither endorsed nor supported by P.H.U. Metrex Marek
+Chuchracki (owner of the Meteo brand) or GreenBlue.
+
 Program do przetwarzania danych wysyłanych przez stację pogody Meteo SP73.
 Ta stacja pogody jest prawie identyczna z wyglądu do stacji pogody GreenBlue
 GB522.
