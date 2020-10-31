@@ -120,6 +120,8 @@ I therefore used `toolchain-mipsel_gcc-linaro_uClibc-0.9.32`, which works correc
   It could be made using a single HTML file, with some JavaScript code that
   would download the results in JSON. The C program could provide a single text file
   that would contain only the last measurement in JSON.
+  - but writing a WeeWX plugin would mostly cover that use case,
 - sending data to a site like wunderground.com,
 - integration into other projects that handle weather station data (I
   could search them on GitHub),
+  - I did some research and writing a WeeWX plugin seems sensible,
