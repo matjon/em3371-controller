@@ -60,8 +60,62 @@ static char *packet_source_to_string(const struct sockaddr_in *packet_source)
 	return packet_source_string;
 }
 
-// It is advisable to call tzset() at the beginning of program
-// Displays a local time converted to a string
+static void initialize_TZ_env()
+{
+        char tzfile_contents[100];
+        FILE *tzfile;
+        char *tzfile_newline = NULL;
+
+        tzfile = fopen("/etc/TZ", "r");
+        if (tzfile == NULL) {
+                return;
+        }
+
+        if (fgets(tzfile_contents, sizeof(tzfile_contents), tzfile) == NULL) {
+                goto close;
+        }
+
+        tzfile_newline = strchr(tzfile_contents, '\n');
+        if (tzfile_newline != NULL) {
+                *tzfile_newline = '\0';
+        }
+
+        // paranoia
+        tzfile_newline = strchr(tzfile_contents, '\r');
+        if (tzfile_newline != NULL) {
+                *tzfile_newline = '\0';
+        }
+
+        setenv("TZ", tzfile_contents, 0);
+
+close:
+        fclose(tzfile);
+}
+
+static void initialize_timezone()
+{
+        /*
+         * My DD-WRT router uses uClibc, which expects timezone to be specified
+         * in the "TZ" environment variable (see "man tzset").
+         *      https://www.uclibc.org/FAQ.html#timezones
+         * The contents from this environment variable are to be initialized
+         * from /etc/TZ, but DD-WRT shell seems not to do this.
+         * uClibc can probably be configured to automatically read timezone
+         * configuration from /etc/TZ, but it seems it is not.
+         *
+         * Therefore we set the TZ environment variable manually before calling
+         * tzset(). On normal Linux /etc/TZ would not exist in most cases, so
+         * this has no effect then.
+         */
+        if (getenv("TZ") == NULL) {
+                initialize_TZ_env();
+        }
+
+	tzset();
+}
+
+// Displays local time converted to a string
+// Call initialize_timezone() once before using this function.
 void current_time_to_string(char *time_out, char buffer_size)
 {
 	time_t current_time = time(NULL);
@@ -146,7 +200,7 @@ int reply_to_ping_packet(int udp_socket, const struct sockaddr_in *packet_source
 
 int main()
 {
-	tzset();
+        initialize_timezone();
 
 	int ret = 0;
 

@@ -86,12 +86,22 @@ I therefore used `toolchain-mipsel_gcc-linaro_uClibc-0.9.32`, which works correc
 - runtime configuration, via a config file or command line parameters,
 - write proper README.md,
 - display time in local timezone on DD-WRT (may be difficult),
+    - should not be required if the weather station receives time signal from DCF77
+      (and we were able to decode it from the packets), as it would be more
+      accurate and reliable,
+
+    - uClibc stores timezone from the TZ environment variable, which is read
+      from /etc/TZ, see https://www.uclibc.org/FAQ.html#timezones
+
+    - probably fixed, TODO: test,
+
 - reverse engineering:
     - devise a more accurate formula to calculate temperature from raw data,
     - describe how `historical1` and `historical2` in `device_single_sensor_data` behave,
     - decode other bytes in packets sent by the device,
-    Some versions of the weather station are described to contain a DCF77 time
-    receiver.
+    Some versions of the weather station are advertised to contain a DCF77 time
+    signal receiver (from a transmitter near Frankfurt, Germany).
+    Time received this way would be more reliable.
 - use a Makefile instead of compile.sh
 - Windows port
     - probably the best approach would be to use Gnulib:
