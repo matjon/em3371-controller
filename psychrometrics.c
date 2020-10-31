@@ -77,7 +77,6 @@
  * Z(T) = (b - T/d) * T / (T + c)
  */
 
-#define _GNU_SOURCE
 #include <math.h>
 #include <stdio.h>
 
@@ -107,11 +106,11 @@ double dew_point(double dry_bulb_temperature, double rel_humidity)
 {
         if (rel_humidity == 0) {
                 fputs("Tried to calculate dew point with "
-                        "relative humidity of 0%, which is incorrect", stderr);
-                return NAN;
+                        "relative humidity of 0%, which is incorrect.\n", stderr);
+                return nan("");
         }
 
-        // TODO: consider checking for abnormal temperature.
+        // TODO: consider checking for abnormal temperature and humidity > 100%.
 
         if (dry_bulb_temperature >= 0.0) {
                 return dew_point_on_water(dry_bulb_temperature, rel_humidity);
