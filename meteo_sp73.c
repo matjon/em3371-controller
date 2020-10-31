@@ -22,7 +22,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-
+#include <math.h>
 
 /*
  * Using packed structs with casting may be unsafe on some architectures:
@@ -81,10 +81,6 @@ bool decode_single_measurement(struct device_single_measurement *measurement,
 
                 measurement->dew_point =
                         dew_point(measurement->temperature, measurement->humidity);
-
-                if (isnanf(measurement->dew_point)) {
-                        measurement->dew_point = DEVICE_INCORRECT_TEMPERATURE;
-                }
         } else {
                 measurement->dew_point = DEVICE_INCORRECT_TEMPERATURE;
         }
@@ -237,6 +233,19 @@ void display_sensor_state_CSV(FILE *stream, const struct device_sensor_state *st
 
 void init_logging()
 {
+        if (nan("") == 0 || !isnan(nan(""))) {
+                //Are there any embedded architectures without support for NaN?
+                //See:
+                //      https://stackoverflow.com/q/2234468
+                //      https://www.gnu.org/software/libc/manual/html_node/Infinity-and-NaN.html
+                //              [...] available only on machines that support the “not a number”
+                //              value—that is to say, on all machines that support IEEE floating
+                //              point.
+                fprintf(stderr, "ERROR: no support for NaN floating point numbers "
+                                "in hardware or software floating point library.\n");
+                exit(1);
+        }
+
         fprintf(stderr, "Output formats are subject to change\n");
         display_CSV_header(stdout);
 }

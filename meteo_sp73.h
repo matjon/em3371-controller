@@ -32,12 +32,9 @@ struct device_single_measurement {
         float dew_point;
 };
 
-//I prefer not to use NaNs because of possible portability issues across architectures.
-//TODO: could this really cause problems?
-//See: https://stackoverflow.com/questions/2234468/do-any-real-world-cpus-not-use-ieee-754
-//The first two macros are also for dew_point
-#define DEVICE_INCORRECT_TEMPERATURE -999.0
-#define DEVICE_IS_INCORRECT_TEMPERATURE(x) (x < -990.0)
+//First two macros are also for dew_point
+#define DEVICE_INCORRECT_TEMPERATURE (nan(""))
+#define DEVICE_IS_INCORRECT_TEMPERATURE(x) (isnan(x))
 #define DEVICE_INCORRECT_HUMIDITY UINT16_MAX
 
 struct device_single_sensor_data {
