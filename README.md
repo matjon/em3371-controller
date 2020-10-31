@@ -24,6 +24,9 @@ Program jest oparty na pracy wykonanej przez Pana Łukasza Kalamłackiego, któr
 wykonał analizę wsteczną protokołu stacji:
 http://kalamlacki.eu/sp73.php
 
+Raporty z używania programu mile widziane - przez bug report na GitHubie lub
+mail na mat.jonczyk w domenie o2.pl.
+
 ## Opis konfiguracji stacji
 
 Do zrobienia: opis konfiguracji stacji - zmiany docelowego adresu, do którego
