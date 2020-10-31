@@ -72,6 +72,10 @@ bool decode_single_measurement(struct device_single_measurement *measurement,
 		measurement->humidity = raw_data[2];
 	}
 
+        // It would be more elegant to calculate the dew point in functions that
+        // handle data presentation, but is done here for performance reasons.
+        // It is a time-consuming calculation on devices with software floating
+        // point emulation.
         if (measurement->humidity != DEVICE_INCORRECT_HUMIDITY &&
                 !DEVICE_IS_INCORRECT_TEMPERATURE(measurement->temperature)) {
 
