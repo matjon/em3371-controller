@@ -60,8 +60,27 @@ the following message in dmesg:
 This problem occured with `toolchain-mipsel_gcc4.1.2` even with this command line parameter.
 I therefore used `toolchain-mipsel_gcc-linaro_uClibc-0.9.32`, which works correctly.
 
+
+## Usage on DD-WRT
+
+- zalecane jest co najmniej 1MB wolnego miejsca na partycji /jffs,
+  - partycja /jffs chyba nie jest domyślnie włączona, trzeba załączyć ją
+    w panelu WEB GUI rutera i przed pierwszym użyciem sformatować,
+
+  - jeśli nie ma takiej opcji, to można użyć mniejszych buildów DD-WRT,
+
+- część danych można jednak trzymać w pamięci RAM, np. dzienniki debugowania
+  (stderr programu),
+
+- najlepiej jest użyć logrotate do rotacji i kompresji logów,
+  - z załączoną opcją sharedscripts,
+
+- plik CSV z jednego dnia nie skompresowany może zająć nawet 500kB, jeśli są obecne
+  wszystkie 3 czujniki,
+
 ## TODO
 
+- dew point calculation,
 - implement log file saving and rotation (useful on devices with limited storage space),
     - using `logrotate` could be easier and better, however,
 - runtime configuration, via a config file or command line parameters,
@@ -78,4 +97,11 @@ I therefore used `toolchain-mipsel_gcc-linaro_uClibc-0.9.32`, which works correc
     - probably the best approach would be to use Gnulib:
             https://www.gnu.org/software/gnulib/
 - maybe some refactoring,
-- document the protocol used by the weather station,
+- write text documentation of the protocol used by the weather station,
+- a webpage that displays the last and historical measurements.
+  It could be made using a single HTML file, with some JavaScript code that
+  would download the results in JSON. The C program could provide a single text file
+  that would contain only the last measurement in JSON.
+- sending data to a site like wunderground.com,
+- integration into other projects that handle weather station data (I
+  could search them on GitHub),
