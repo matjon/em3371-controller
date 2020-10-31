@@ -1,6 +1,6 @@
 SOURCES="main.c meteo_sp73.c"
 OUTPUT_BASE=sp73_decoder
-COMMON_PARAMETERS="-std=gnu99 -Wall -Wextra"
+COMMON_PARAMETERS="-O2 -std=gnu99 -Wall -Wextra"
 
 gcc $COMMON_PARAMETERS $SOURCES -o ${OUTPUT_BASE}
 
@@ -16,13 +16,13 @@ gcc $COMMON_PARAMETERS psychrometrics.c psychrometrics_test.c -o psychrometrics_
 #export PATH=/media/1T-noraid/dd-wrt/toolchain-mipsel_gcc4.1.2/bin:$PATH
 export PATH=/media/1T-noraid/dd-wrt/toolchain-mipsel_gcc-linaro_uClibc-0.9.32/bin:$PATH
 mipsel-linux-uclibc-gcc                                         \
-        -DBCMWPA2 -O2 -pipe -mips32 -mtune=mips32               \
+        -DBCMWPA2 -pipe -mips32 -mtune=mips32                   \
         -fno-caller-saves  -mno-branch-likely -msoft-float      \
         $COMMON_PARAMETERS                                      \
         $SOURCES -o ${OUTPUT_BASE}_mipsel
 
 mipsel-linux-uclibc-gcc                                         \
-        -DBCMWPA2 -O2 -pipe -mips32 -mtune=mips32               \
+        -DBCMWPA2 -pipe -mips32 -mtune=mips32                   \
         -fno-caller-saves  -mno-branch-likely -msoft-float      \
         $COMMON_PARAMETERS                                      \
         psychrometrics.c psychrometrics_test.c                  \
