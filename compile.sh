@@ -1,8 +1,9 @@
-SOURCES="main.c meteo_sp73.c"
+SOURCES="main.c meteo_sp73.c psychrometrics.c"
 OUTPUT_BASE=sp73_decoder
 COMMON_PARAMETERS="-O2 -std=gnu99 -Wall -Wextra"
+#COMMON_PARAMETERS="-O0 -g -std=gnu99 -Wall -Wextra"
 
-gcc $COMMON_PARAMETERS $SOURCES -o ${OUTPUT_BASE}
+gcc $COMMON_PARAMETERS $SOURCES -o ${OUTPUT_BASE} -lm
 
 gcc $COMMON_PARAMETERS psychrometrics.c psychrometrics_test.c -o psychrometrics_test -lm
 
@@ -20,7 +21,7 @@ if [ "$1" == 'dd-wrt' ]; then
                 -DBCMWPA2 -pipe -mips32 -mtune=mips32                   \
                 -fno-caller-saves  -mno-branch-likely -msoft-float      \
                 $COMMON_PARAMETERS                                      \
-                $SOURCES -o ${OUTPUT_BASE}_mipsel
+                $SOURCES -o ${OUTPUT_BASE}_mipsel -lm
 
         mipsel-linux-uclibc-gcc                                         \
                 -DBCMWPA2 -pipe -mips32 -mtune=mips32                   \

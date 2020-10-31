@@ -18,6 +18,7 @@
 #include "meteo_sp73.h"
 #include "main.h"
 #include "config.h"
+#include "psychrometrics.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -39,6 +40,7 @@ bool decode_single_measurement(struct device_single_measurement *measurement,
 	if (raw_data[0] == 0xff && raw_data[1] == 0xff && raw_data[2] == 0xff) {
 		measurement->humidity = DEVICE_INCORRECT_HUMIDITY;
 		measurement->temperature = DEVICE_INCORRECT_TEMPERATURE;
+		measurement->dew_point = DEVICE_INCORRECT_TEMPERATURE;
 		return false;
 	}
 
@@ -69,6 +71,19 @@ bool decode_single_measurement(struct device_single_measurement *measurement,
 	} else {
 		measurement->humidity = raw_data[2];
 	}
+
+        if (measurement->humidity != DEVICE_INCORRECT_HUMIDITY &&
+                !DEVICE_IS_INCORRECT_TEMPERATURE(measurement->temperature)) {
+
+                measurement->dew_point =
+                        dew_point(measurement->temperature, measurement->humidity);
+
+                if (isnanf(measurement->dew_point)) {
+                        measurement->dew_point = DEVICE_INCORRECT_TEMPERATURE;
+                }
+        } else {
+                measurement->dew_point = DEVICE_INCORRECT_TEMPERATURE;
+        }
 
 	return true;
 }
@@ -123,6 +138,10 @@ void display_single_measurement_json(FILE *stream, const struct device_single_me
 		fprintf(stream, " \"humidity\": %d", (int) state->humidity);
 	}
 
+        if (!DEVICE_IS_INCORRECT_TEMPERATURE(state->dew_point)) {
+		fprintf(stream, ", \"dew_point\": %.2f", (double) state->dew_point);
+        }
+
 	fprintf(stream, " }");
 }
 
@@ -167,10 +186,10 @@ void display_sensor_state_json(FILE *stream, const struct device_sensor_state *s
 void display_CSV_header(FILE *stream)
 {
         fputs("time;atmospheric_pressure;"
-                "station_temp;station_temp_raw;station_humidity;"
-                "sensor1_temp;sensor1_temp_raw;sensor1_humidity;"
-                "sensor2_temp;sensor2_temp_raw;sensor2_humidity;"
-                "sensor3_temp;sensor3_temp_raw;sensor3_humidity;"
+                "station_temp;station_temp_raw;station_humidity;station_dew_point;"
+                "sensor1_temp;sensor1_temp_raw;sensor1_humidity;sensor1_dew_point;"
+                "sensor2_temp;sensor2_temp_raw;sensor2_humidity;sensor2_dew_point;"
+                "sensor3_temp;sensor3_temp_raw;sensor3_humidity;sensor3_dew_point;"
                 "\n", stream);
 }
 
@@ -188,6 +207,12 @@ void display_single_measurement_CSV(FILE *stream, const struct device_single_mea
                 fprintf(stream, ";");
         } else {
 		fprintf(stream, "%d;", (int) state->humidity);
+        }
+
+        if (DEVICE_IS_INCORRECT_TEMPERATURE(state->dew_point)) {
+                fprintf(stream, ";");
+        } else {
+		fprintf(stream, "%.2f;", (double) state->dew_point);
         }
 }
 
