@@ -87,8 +87,6 @@ I therefore used `toolchain-mipsel_gcc-linaro_uClibc-0.9.32`, which works correc
 
 ## TODO
 
-- dew point calculation,
-  - implemented, but not used in the main program yet,
 - implement log file saving and rotation (useful on devices with limited storage space),
     - using `logrotate` could be easier and better, however,
 - runtime configuration, via a config file or command line parameters,
