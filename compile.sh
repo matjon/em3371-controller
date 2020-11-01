@@ -1,7 +1,7 @@
 SOURCES="main.c meteo_sp73.c psychrometrics.c"
 OUTPUT_BASE=sp73_decoder
-COMMON_PARAMETERS="-O2 -std=gnu99 -Wall -Wextra"
-#COMMON_PARAMETERS="-O0 -g -std=gnu99 -Wall -Wextra"
+COMMON_PARAMETERS="-O2 -std=c99 -Wall -Wextra"
+#COMMON_PARAMETERS="-O0 -g -std=c99 -Wall -Wextra"
 
 gcc $COMMON_PARAMETERS $SOURCES -o ${OUTPUT_BASE} -lm
 
@@ -31,5 +31,4 @@ if [ "$1" == 'dd-wrt' ]; then
                 -o psychrometrics_test_mipsel -lm
 
         # Additional possible GCC parameters: -minterlink-mips16 -mips16
-        #
 fi
