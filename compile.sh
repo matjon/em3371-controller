@@ -1,4 +1,4 @@
-SOURCES="main.c emax_em3371.c psychrometrics.c output_json.c"
+SOURCES="main.c emax_em3371.c psychrometrics.c output_json.c output_csv.c"
 OUTPUT_BASE=emax_em3371_decoder
 COMMON_PARAMETERS="-O2 -std=c99 -Wall -Wextra"
 #COMMON_PARAMETERS="-O0 -g -std=c99 -Wall -Wextra"
