@@ -2,10 +2,29 @@ Program to capture data from LivingSense-compatible weather stations
 ====================================================================
 
 A program to receive and decode network traffic from WiFi-enabled weather
-stations: Meteo SP73 and GreenBlue GB522.
+stations - the many rebranded versions of EMAX EM3371:
+        - Meteo SP73,
+        - GreenBlue GB522,
+        - Meteo Logic EM3371,
+        - DIGOO DG-EX001.
 
-Notice: this program is neither endorsed nor supported by P.H.U. Metrex Marek
-Chuchracki (owner of the Meteo brand) or GreenBlue.
+Notice: this is a third party program. It is neither endorsed nor supported by
+EMAX or the above weather station brands. All trademarks are used only for
+the purpose of showing compatibility or potential compatibility.
+
+
+        pon, 2 lis 2020, 18:07:07 CET
+        - weather station Meteo Logic EM3371 looks similar, so it
+        may also be compatible:
+        https://www.youtube.com/watch?v=G7D54pm1FjE
+
+        DIGOO DG-EX001 should also be the same model rebranded,
+
+        EDIT: pon, 2 lis 2020, 18:59:16 CET
+        http://www.emaxtime.com/product/13.html
+                - product info on the manufacturer's website, where the station
+                  is called "EM3371 Wifi weather [sic]"
+
 
 Program do przetwarzania danych wysyłanych przez stację pogody Meteo SP73.
 Ta stacja pogody jest prawie identyczna z wyglądu do stacji pogody GreenBlue
