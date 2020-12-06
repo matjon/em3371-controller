@@ -19,6 +19,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <math.h>       //isnan(x)
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/ip.h>
