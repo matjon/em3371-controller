@@ -1,7 +1,7 @@
 .*.swp
 *~
-sp73_decoder
-sp73_decoder_mipsel
+emax_em3371_decoder
+emax_em3371_decoder_mipsel
 psychrometrics_test
 psychrometrics_test_mipsel
 notatki.txt
