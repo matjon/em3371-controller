@@ -15,7 +15,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "meteo_sp73.h"
+#include "emax_em3371.h"
 #include "main.h"
 #include "config.h"
 #include "psychrometrics.h"

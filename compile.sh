@@ -1,4 +1,4 @@
-SOURCES="main.c meteo_sp73.c psychrometrics.c"
+SOURCES="main.c emax_em3371.c psychrometrics.c"
 OUTPUT_BASE=emax_em3371_decoder
 COMMON_PARAMETERS="-O2 -std=c99 -Wall -Wextra"
 #COMMON_PARAMETERS="-O0 -g -std=c99 -Wall -Wextra"

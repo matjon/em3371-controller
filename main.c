@@ -20,7 +20,7 @@
 
 #include "config.h"
 #include "main.h"
-#include "meteo_sp73.h"
+#include "emax_em3371.h"
 
 #include <ctype.h>
 #include <errno.h>
