@@ -33,6 +33,8 @@ struct program_options {
         uint16_t bind_port;
 
         bool reply_to_ping_packets;
+
+        char *status_file_path;
 };
 
 void current_time_to_string(char *time_out, char buffer_size);

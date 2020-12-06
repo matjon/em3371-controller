@@ -238,6 +238,7 @@ static void parse_program_options(const int argc, char **argv,
                 { "bind-address", required_argument, NULL, 'a' },
                 { "listen-port",  required_argument, NULL, 'l' },
                 { "no-reply",     no_argument,       NULL, 'r' },
+                { "status-file",  required_argument, NULL, 's' },
                 {0, 0, 0, 0}
         };
 
@@ -246,6 +247,7 @@ static void parse_program_options(const int argc, char **argv,
         options->bind_port = 1234;
 
         options->reply_to_ping_packets = true;
+        options->status_file_path = NULL;
 
         // The following is vaguely based on the example code in
         // https://www.gnu.org/software/libc/manual/html_node/Getopt-Long-Option-Example.html
@@ -254,7 +256,7 @@ static void parse_program_options(const int argc, char **argv,
                 char *endptr = NULL;
                 long port_number = 0;
 
-                ret = getopt_long (argc, argv, "a:l:r", long_options, &option_index);
+                ret = getopt_long (argc, argv, "a:l:rs:", long_options, &option_index);
                 if (ret == -1) {
                         break;
                 }
@@ -300,6 +302,10 @@ static void parse_program_options(const int argc, char **argv,
                         * so that the weather station would not be confused.
                         */
                         options->reply_to_ping_packets = false;
+                        break;
+
+                case 's':
+                        options->status_file_path = optarg;
                         break;
 
                 case '?':
