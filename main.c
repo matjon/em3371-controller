@@ -133,7 +133,7 @@ void current_time_to_string(char *time_out, char buffer_size)
 	strftime(time_out, buffer_size, "%Y-%m-%d %H:%M:%S", &current_time_tm);
 }
 
-void hexdump_buffer(FILE *stream, const unsigned char *buffer,
+static void hexdump_buffer(FILE *stream, const unsigned char *buffer,
                 size_t buffer_size, const int bytes_per_line)
 {
 	// TODO: make the function more readable
@@ -201,13 +201,13 @@ int reply_to_ping_packet(int udp_socket, const struct sockaddr_in *packet_source
 	return 0;
 }
 
-void on_interrupt(int signum)
+static void on_interrupt(int signum)
 {
         stop_execution = true;
         stop_execution_signal = signum;
 }
 
-void init_signals()
+static void init_signals()
 {
         sigset_t signal_mask;
         sigemptyset(&signal_mask);
@@ -229,7 +229,7 @@ void init_signals()
         INSTALL_SIGNAL(SIGINT)
 }
 
-void parse_program_options(const int argc, char **argv,
+static void parse_program_options(const int argc, char **argv,
                 struct program_options *options)
 {
         int ret;

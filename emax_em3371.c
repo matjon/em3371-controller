@@ -35,7 +35,7 @@
  * Accesses three bytes from raw_data.
  * Returns true if at least some data is present.
  */
-bool decode_single_measurement(struct device_single_measurement *measurement,
+static bool decode_single_measurement(struct device_single_measurement *measurement,
 		const unsigned char *raw_data)
 {
 	if (raw_data[0] == 0xff && raw_data[1] == 0xff && raw_data[2] == 0xff) {
@@ -89,7 +89,7 @@ bool decode_single_measurement(struct device_single_measurement *measurement,
 	return true;
 }
 
-bool decode_single_sensor_data(struct device_single_sensor_data *out,
+static bool decode_single_sensor_data(struct device_single_sensor_data *out,
 		const unsigned char *raw_data)
 {
 	bool have_current_data = decode_single_measurement(&(out->current), raw_data);
@@ -101,7 +101,7 @@ bool decode_single_sensor_data(struct device_single_sensor_data *out,
 	return out->any_data_present;
 }
 
-void decode_sensor_state(struct device_sensor_state *state, const unsigned char *received_packet,
+static void decode_sensor_state(struct device_sensor_state *state, const unsigned char *received_packet,
 		const size_t received_packet_size)
 {
 	if (received_packet_size <= 61) {
