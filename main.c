@@ -179,21 +179,20 @@ void dump_incoming_packet(FILE *stream, const struct sockaddr_in *packet_source,
 }
 
 
-int reply_to_ping_packet(int udp_socket, const struct sockaddr_in *packet_source,
-                const unsigned char *received_packet, const size_t received_packet_size)
+int send_udp_packet(int udp_socket, const struct sockaddr_in *destination,
+                const unsigned char *payload, const size_t payload_size)
 {
 	long int ret = 0;
-	fputs("Handling the received packet as a ping packet, sending it back\n", stderr);
-	ret = sendto(udp_socket, received_packet, received_packet_size, 0,
-			(const struct sockaddr*) packet_source, sizeof(*packet_source));
+	ret = sendto(udp_socket, payload, payload_size, 0,
+			(const struct sockaddr*) destination, sizeof(*destination));
 
-	if (ret != (long int)received_packet_size) {
+	if (ret != (long int)payload_size) {
 		if (ret == -1) {
-			perror("Cannot reply to a ping packet");
+			perror("Cannot send an UDP packet:");
 		} else {
-			fprintf(stderr, "Problem with reply to a ping packet: "
+			fprintf(stderr, "Problem with sending an UDP packet: "
                                         "tried to send %ld bytes, sent %ld bytes.\n",
-                                        (long int) received_packet_size, ret
+                                        (long int) payload_size, ret
                                 );
 		}
 		return -1;

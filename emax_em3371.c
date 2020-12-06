@@ -169,7 +169,9 @@ void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_so
 
 	if (received_packet_size < 20) {
                 if (options->reply_to_ping_packets) {
-                        reply_to_ping_packet(udp_socket, packet_source,
+                        fputs("Handling the received packet "
+                                "as a ping packet, sending it back\n", stderr);
+                        send_udp_packet(udp_socket, packet_source,
                                         received_packet, received_packet_size);
                 }
 	} else if (received_packet_size >= 65) {

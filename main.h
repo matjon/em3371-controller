@@ -38,5 +38,5 @@ struct program_options {
 };
 
 void current_time_to_string(char *time_out, char buffer_size);
-int reply_to_ping_packet(int udp_socket, const struct sockaddr_in *packet_source, const unsigned char *received_packet, const size_t received_packet_size);
+int send_udp_packet(int udp_socket, const struct sockaddr_in *packet_source, const unsigned char *received_packet, const size_t received_packet_size);
 void dump_incoming_packet(FILE *stream, const struct sockaddr_in *packet_source, const unsigned char *received_packet, const size_t received_packet_size);
