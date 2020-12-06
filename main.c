@@ -18,7 +18,6 @@
 // for asprintf()
 #define _GNU_SOURCE
 
-#include "config.h"
 #include "main.h"
 #include "emax_em3371.h"
 
@@ -38,6 +37,7 @@
 #include <netinet/udp.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <getopt.h>
 
 
 volatile bool stop_execution = false;
@@ -229,28 +229,99 @@ void init_signals()
         INSTALL_SIGNAL(SIGINT)
 }
 
-void parse_program_options(struct program_options *options)
+void parse_program_options(const int argc, char **argv,
+                struct program_options *options)
 {
-	if (! inet_aton(CONFIG_BIND_ADDRESS, &(options->bind_address))) {
-		puts("Incorrect CONFIG_BIND_ADDRESS defined in config.h\n");
-		exit(1);
-	}
+        int ret;
 
-        options->bind_port = CONFIG_BIND_PORT;
+        static struct option long_options[] = {
+                { "bind-address", required_argument, NULL, 'a' },
+                { "listen-port",  required_argument, NULL, 'l' },
+                { "no-reply",     no_argument,       NULL, 'r' },
+                {0, 0, 0, 0}
+        };
 
-#ifdef CONFIG_REPLY_TO_PING_PACKETS
+        // Set defaults
+        inet_aton("0.0.0.0", &(options->bind_address));
+        options->bind_port = 1234;
+
         options->reply_to_ping_packets = true;
-#else
-        options->reply_to_ping_packets = false;
-#endif
+
+        // The following is vaguely based on the example code in
+        // https://www.gnu.org/software/libc/manual/html_node/Getopt-Long-Option-Example.html
+        while (true) {
+                int option_index = 0;
+                char *endptr = NULL;
+                long port_number = 0;
+
+                ret = getopt_long (argc, argv, "a:l:r", long_options, &option_index);
+                if (ret == -1) {
+                        break;
+                }
+
+                switch (ret) {
+                case 'a':
+                        if (! inet_aton(optarg, &(options->bind_address))) {
+                                fputs("Incorrect bind address specified on command line!\n",
+                                                stderr);
+                                exit(1);
+                        }
+                        break;
+
+                case 'l':
+                        endptr = NULL;
+                        port_number = strtol(optarg, &endptr, 10);
+                        if (*endptr != 0) {
+                                fputs("Incorrect listen port specified on command line!\n",
+                                                stderr);
+                                exit(1);
+                        }
+                        if (port_number > 65535 || port_number <= 0 ) {
+                                fputs("Listen port passed on command line out of range!\n",
+                                                stderr);
+                                exit(1);
+                        }
+                        options->bind_port = port_number;
+                        break;
+
+                case 'r':
+                        /*
+                        * The Meteo SP73 weather station sends two kinds of packets: short and long ones.
+                        *
+                        * The long packets contain proper sensor data, the short packets appear to be part of
+                        * a ping-like mechanism: it is probably necessary to send them back
+                        * so that the weather station will send long packets later.
+                        *
+                        * This variable controls whether to send short ping packets back.
+                        * It should normally be enabled (defined), except in cases
+                        * when packets are duplicated to another computer using
+                        * e.g. the TEE target from iptables.
+                        * In this case, this knob should be enabled only on one of the computers
+                        * so that the weather station would not be confused.
+                        */
+                        options->reply_to_ping_packets = false;
+                        break;
+
+                case '?':
+                        exit(1);
+                default:
+                        fputs("Incorrect command line parameters!\n", stderr);
+                        exit(1);
+                }
+        }
+
+        if (optind < argc) {
+                fputs("Incorrect command line parameters!\n", stderr);
+                exit(1);
+        }
 }
 
-int main()
+int main(int argc, char **argv)
 {
         initialize_timezone();
 
         struct program_options options;
-        parse_program_options(&options);
+        parse_program_options(argc, argv, &options);
 
 	int ret = 0;
 
