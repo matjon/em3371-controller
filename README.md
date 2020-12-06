@@ -134,7 +134,8 @@ I therefore used `toolchain-mipsel_gcc-linaro_uClibc-0.9.32`, which works correc
 
 ## TODO
 
-- implement log file saving and rotation (useful on devices with limited storage space),
+- implement log file saving and rotation (useful especially on devices with
+  limited storage space),
     - using `logrotate` could be easier and better, however,
 - handle '--help' command line parameter,
 - write proper README.md,
@@ -170,3 +171,7 @@ I therefore used `toolchain-mipsel_gcc-linaro_uClibc-0.9.32`, which works correc
 - integration into other projects that handle weather station data (I
   could search them on GitHub),
   - I did some research and writing a WeeWX plugin seems sensible,
+  - or perhaps modifying wview, but it seems not to be maintained any longer,
+
+- find other weather stations that should be compatible with this software,
+  - searching for "Livingsense" (the mobile app name) may be helpful,
