@@ -1,5 +1,5 @@
-Data logger for WiFi weather stations: Meteo SP73 and GreenBlue GB522
-=====================================================================
+Program to capture data from LivingSense-compatible weather stations
+====================================================================
 
 A program to receive and decode network traffic from WiFi-enabled weather
 stations: Meteo SP73 and GreenBlue GB522.
