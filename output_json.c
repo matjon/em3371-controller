@@ -18,6 +18,7 @@
 
 #include "emax_em3371.h"
 #include "main.h"
+#include "output_json.h"
 #include <stdio.h>
 
 static void display_single_measurement_json(FILE *stream, const struct device_single_measurement *state)
@@ -81,4 +82,3 @@ void display_sensor_state_json(FILE *stream, const struct device_sensor_state *s
 
 	fprintf(stream, "\n}\n");
 }
-
