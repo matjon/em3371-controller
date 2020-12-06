@@ -34,6 +34,34 @@ są wysyłane dane.
 
 Formaty wyjścia programu (JSON, CSV) mogą się zmienić w przyszłej wersji.
 
+## General remarks on weather station use
+
+A good guide on weather station sensor placement can be found at
+        https://www.wunderground.com/pws/installation-guide
+
+### How to check weather station sensor reliability
+
+This procedure requires that the outdoor temperature is lower then the indoor
+temperature.
+
+1. Place one sensor inside the room and one outside.
+2. Air the room vigoriously for a while - long enough that most air is
+   exchanged and it feels cold inside the room, but not too long - so that the
+   walls and furniture do not get cold.
+3. Close the windows, exit the room and close the door behind. Wait a while ---
+   the air should quickly get warmer and sensor readings stabilize.
+4. Compare dew point inside and outside - as calculated from measurements
+   provided by both sensors. Sensors inside and outside will provide different
+   humidity and temperature readings, but dew point values should be similar.
+
+Air (especially dry air) has low heat capacity so after closing the windows it
+will quickly get warmer from walls and furniture.
+
+
+
+and wait a while so that
+
+
 ## Compilation for DD-WRT
 
 It is necessary to use a toolchain that links code with the C library used in the DD-WRT build,
