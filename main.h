@@ -17,7 +17,7 @@
 
 #pragma once
 
-
+#include <stdbool.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -25,6 +25,15 @@
 #include <netinet/in.h>
 
 #define RECEIVE_PACKET_SIZE 1500
+
+struct program_options {
+        // in host byte order
+	struct in_addr bind_address;
+        // in host byte order
+        uint16_t bind_port;
+
+        bool reply_to_ping_packets;
+};
 
 void current_time_to_string(char *time_out, char buffer_size);
 int reply_to_ping_packet(int udp_socket, const struct sockaddr_in *packet_source, const unsigned char *received_packet, const size_t received_packet_size);

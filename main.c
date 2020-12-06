@@ -229,9 +229,28 @@ void init_signals()
         INSTALL_SIGNAL(SIGINT)
 }
 
+void parse_program_options(struct program_options *options)
+{
+	if (! inet_aton(CONFIG_BIND_ADDRESS, &(options->bind_address))) {
+		puts("Incorrect CONFIG_BIND_ADDRESS defined in config.h\n");
+		exit(1);
+	}
+
+        options->bind_port = CONFIG_BIND_PORT;
+
+#ifdef CONFIG_REPLY_TO_PING_PACKETS
+        options->reply_to_ping_packets = true;
+#else
+        options->reply_to_ping_packets = false;
+#endif
+}
+
 int main()
 {
         initialize_timezone();
+
+        struct program_options options;
+        parse_program_options(&options);
 
 	int ret = 0;
 
@@ -243,15 +262,10 @@ int main()
 		exit(1);
 	}
 
-	struct in_addr bind_address;
-	if (! inet_aton(CONFIG_BIND_ADDRESS, &bind_address)) {
-		puts("Incorrect CONFIG_BIND_ADDRESS defined in config.h\n");
-		exit(1);
-	}
 	struct sockaddr_in bind_sockaddr = {
 		.sin_family = AF_INET,
-		.sin_port = htons(CONFIG_BIND_PORT),
-		.sin_addr = bind_address,
+		.sin_port = htons(options.bind_port),
+		.sin_addr = options.bind_address,
 	};
 
 	ret = bind(udp_socket, (struct sockaddr *) &bind_sockaddr, sizeof(bind_sockaddr));
@@ -290,7 +304,8 @@ int main()
                         }
 			// We continue anyway
 		} else {
-			process_incoming_packet(udp_socket, &src_addr, received_packet, ret);
+			process_incoming_packet(udp_socket, &src_addr, received_packet, ret,
+                                        &options);
 		}
 	}
 

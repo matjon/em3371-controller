@@ -23,6 +23,7 @@
 #include <sys/socket.h>
 #include <netinet/ip.h>
 #include <netinet/in.h>
+#include "main.h"
 
 struct device_single_measurement {
 	float temperature;
@@ -63,4 +64,5 @@ struct device_sensor_state {
 
 void init_logging();
 void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_source,
-		const unsigned char *received_packet, const size_t received_packet_size);
+		const unsigned char *received_packet, const size_t received_packet_size,
+                const struct program_options *options);

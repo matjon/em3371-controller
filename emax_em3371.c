@@ -17,7 +17,6 @@
 
 #include "emax_em3371.h"
 #include "main.h"
-#include "config.h"
 #include "psychrometrics.h"
 
 #include <stdlib.h>
@@ -253,17 +252,16 @@ void init_logging()
 
 // Main program logic
 void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_source,
-		const unsigned char *received_packet, const size_t received_packet_size)
+		const unsigned char *received_packet, const size_t received_packet_size,
+                const struct program_options *options)
 {
 	dump_incoming_packet(stderr, packet_source, received_packet, received_packet_size);
 
 	if (received_packet_size < 20) {
-#ifdef CONFIG_REPLY_TO_PING_PACKETS
-	// See description in config.h
-	// TODO: check the contents of the packet, not just its size
-		reply_to_ping_packet(udp_socket, packet_source,
-				received_packet, received_packet_size);
-#endif
+                if (options->reply_to_ping_packets) {
+                        reply_to_ping_packet(udp_socket, packet_source,
+                                        received_packet, received_packet_size);
+                }
 	} else if (received_packet_size >= 65) {
 
 		struct device_sensor_state *sensor_state;
