@@ -246,7 +246,7 @@ void init_logging()
                 exit(1);
         }
 
-        fprintf(stderr, "Output formats are subject to change\n");
+        fprintf(stderr, "Warning: output formats are subject to change\n");
         display_CSV_header(stdout);
 }
 
