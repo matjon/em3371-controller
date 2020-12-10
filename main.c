@@ -235,7 +235,7 @@ static void parse_program_options(const int argc, char **argv,
 
         static struct option long_options[] = {
                 { "bind-address", required_argument, NULL, 'a' },
-                { "listen-port",  required_argument, NULL, 'p' },
+                { "port",         required_argument, NULL, 'p' },
                 { "no-reply",     no_argument,       NULL, 'r' },
                 { "status-file",  required_argument, NULL, 's' },
                 {0, 0, 0, 0}
