@@ -235,7 +235,7 @@ static void parse_program_options(const int argc, char **argv,
 
         static struct option long_options[] = {
                 { "bind-address", required_argument, NULL, 'a' },
-                { "listen-port",  required_argument, NULL, 'l' },
+                { "listen-port",  required_argument, NULL, 'p' },
                 { "no-reply",     no_argument,       NULL, 'r' },
                 { "status-file",  required_argument, NULL, 's' },
                 {0, 0, 0, 0}
@@ -255,7 +255,7 @@ static void parse_program_options(const int argc, char **argv,
                 char *endptr = NULL;
                 long port_number = 0;
 
-                ret = getopt_long (argc, argv, "a:l:rs:", long_options, &option_index);
+                ret = getopt_long (argc, argv, "a:p:rs:", long_options, &option_index);
                 if (ret == -1) {
                         break;
                 }
@@ -269,7 +269,7 @@ static void parse_program_options(const int argc, char **argv,
                         }
                         break;
 
-                case 'l':
+                case 'p':
                         endptr = NULL;
                         port_number = strtol(optarg, &endptr, 10);
                         if (*endptr != 0) {
