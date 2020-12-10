@@ -119,7 +119,34 @@ static void decode_sensor_state(struct device_sensor_state *state, const unsigne
 	} else {
 		state->atmospheric_pressure = received_packet[59] + received_packet[60]*256;
 	}
+
 }
+
+static bool is_packet_correct(const unsigned char *received_packet,
+		const size_t received_packet_size)
+{
+        if (received_packet[0] != '<') {
+                fprintf(stderr, "Incorrect first byte of packet\n");
+                return false;
+        }
+
+        if (received_packet[received_packet_size-1] != '>') {
+                fprintf(stderr, "Incorrect last byte of packet\n");
+                return false;
+        }
+
+        unsigned char sum = 0;
+        for (size_t i=0; i < received_packet_size-2; i++) {
+                sum+=received_packet[i];
+        }
+        if (received_packet[received_packet_size-2] != sum) {
+                fprintf(stderr, "Incorrect packet checksum\n");
+                return false;
+        }
+        fprintf(stderr, "Packet is correct\n");
+        return true;
+}
+
 
 
 void init_logging()
@@ -166,6 +193,9 @@ void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_so
                 const struct program_options *options)
 {
 	dump_incoming_packet(stderr, packet_source, received_packet, received_packet_size);
+        if (!is_packet_correct(received_packet, received_packet_size)) {
+                return;
+        }
 
 	if (received_packet_size < 20) {
                 if (options->reply_to_ping_packets) {
