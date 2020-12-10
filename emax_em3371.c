@@ -109,9 +109,9 @@ static void decode_sensor_state(struct device_sensor_state *state, const unsigne
 		return;
 	}
 
-	decode_single_sensor_data(&(state->station_sensor), received_packet + 22);
+	decode_single_sensor_data(&(state->station_sensor), received_packet + 21);
 	for (int i = 0; i < 3; i++) {
-		decode_single_sensor_data(&(state->remote_sensors[i]), received_packet + 31 + i*9);
+		decode_single_sensor_data(&(state->remote_sensors[i]), received_packet + 30 + i*9);
 	}
 
 	if (received_packet[59] == 0xff && received_packet[60] == 0xff) {
