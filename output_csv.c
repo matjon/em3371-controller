@@ -63,4 +63,12 @@ void display_sensor_state_CSV(FILE *stream, const struct device_sensor_state *st
         }
 
         fprintf(stream, "\n");
+
+        // When redirecting CSV output to file, there was quite a long delay
+        // (even several minutes or more) before the data was actually written
+        // to file and accessible.
+        //
+        // Using fflush manually fixes this.
+        // (fflush() does not have undesirable side-effects of fsync())
+        fflush(stream);
 }
