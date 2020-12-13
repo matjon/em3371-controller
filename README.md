@@ -1,17 +1,20 @@
-Program to capture data from LivingSense-compatible weather stations
-====================================================================
+Program to capture data from some LivingSense-compatible weather stations
+=========================================================================
 
-A program to receive and decode network traffic from WiFi-enabled weather
+A program to receive and decode network traffic from some WiFi-enabled weather
 stations - the many rebranded versions of EMAX EM3371:
         - Meteo SP73,
         - GreenBlue GB522,
         - Meteo Logic EM3371,
         - DIGOO DG-EX001.
 
+This program has been tested on a Meteo SP73 weather station, which was bought
+in late 2020. It is based on reverse-engineering work performed by Mr Łukasz
+Kalamłacki: http://kalamlacki.eu/sp73.php
+
 Notice: this is a third party program. It is neither endorsed nor supported by
 EMAX or the above weather station brands. All trademarks are used only for
 the purpose of showing compatibility or potential compatibility.
-
 
         pon, 2 lis 2020, 18:07:07 CET
         - weather station Meteo Logic EM3371 looks similar, so it
@@ -25,6 +28,13 @@ the purpose of showing compatibility or potential compatibility.
                 - product info on the manufacturer's website, where the station
                   is called "EM3371 Wifi weather [sic]"
 
+Supported operating systems
+---------------------------
+
+This program was written in a way that enabled it to be used on constrained
+resource devices, such as home routers.
+
+This program runs on GNU/Linux and DD-WRT. It was not tested on OpenWRT, but
 
 Program do przetwarzania danych wysyłanych przez stację pogody Meteo SP73.
 Ta stacja pogody jest prawie identyczna z wyglądu do stacji pogody GreenBlue
@@ -48,8 +58,6 @@ mail na mat.jonczyk w domenie o2.pl.
 
 ## Opis konfiguracji stacji
 
-Do zrobienia: opis konfiguracji stacji - zmiany docelowego adresu, do którego
-są wysyłane dane.
 
 Formaty wyjścia programu (JSON, CSV) mogą się zmienić w przyszłej wersji.
 
