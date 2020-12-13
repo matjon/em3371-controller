@@ -25,6 +25,7 @@ void display_CSV_header(FILE *stream)
                 "sensor2_temp;sensor2_humidity;sensor2_dew_point;"
                 "sensor3_temp;sensor3_humidity;sensor3_dew_point;"
                 "\n", stream);
+        fflush(stream);
 }
 
 static void display_single_measurement_CSV(FILE *stream, const struct device_single_measurement *state)
