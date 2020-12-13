@@ -16,17 +16,6 @@ Notice: this is a third party program. It is neither endorsed nor supported by
 EMAX or the above weather station brands. All trademarks are used only for
 the purpose of showing compatibility or potential compatibility.
 
-        pon, 2 lis 2020, 18:07:07 CET
-        - weather station Meteo Logic EM3371 looks similar, so it
-        may also be compatible:
-        https://www.youtube.com/watch?v=G7D54pm1FjE
-
-        DIGOO DG-EX001 should also be the same model rebranded,
-
-        EDIT: pon, 2 lis 2020, 18:59:16 CET
-        http://www.emaxtime.com/product/13.html
-                - product info on the manufacturer's website, where the station
-                  is called "EM3371 Wifi weather [sic]"
 
 Supported operating systems
 ---------------------------
@@ -210,3 +199,17 @@ I therefore used `toolchain-mipsel_gcc-linaro_uClibc-0.9.32`, which works correc
 - dew point calculation: check which parameters to choose when the dry bulb
   temperature is above 0°C, but the dew point / frost point is below 0°C,
 - change license to GPLv2+, as the MySQL libraries are not compatible with GPLv3.
+
+## Links
+
+        pon, 2 lis 2020, 18:07:07 CET
+        - weather station Meteo Logic EM3371 looks similar, so it
+        may also be compatible:
+        https://www.youtube.com/watch?v=G7D54pm1FjE
+
+        DIGOO DG-EX001 should also be the same model rebranded,
+
+        EDIT: pon, 2 lis 2020, 18:59:16 CET
+        http://www.emaxtime.com/product/13.html
+                - product info on the manufacturer's website, where the station
+                  is called "EM3371 Wifi weather [sic]"
