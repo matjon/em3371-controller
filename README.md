@@ -16,6 +16,8 @@ Notice: this is a third party program. It is neither endorsed nor supported by
 EMAX or the above weather station brands. All trademarks are used only for
 the purpose of showing compatibility or potential compatibility.
 
+Usage reports are very welcome - through a GitHub bug report or a mail to
+"mat.jonczyk" in the domain "o2.pl".
 
 Supported operating systems
 ---------------------------
@@ -24,56 +26,50 @@ This program was written in a way that enabled it to be used on constrained
 resource devices, such as home routers.
 
 This program runs on GNU/Linux and DD-WRT. It was not tested on OpenWRT, but
+modifying it to work there should be simple. It should run without problems on
+a Raspberry Pi with GNU/Linux installed.
 
-Program do przetwarzania danych wysyłanych przez stację pogody Meteo SP73.
-Ta stacja pogody jest prawie identyczna z wyglądu do stacji pogody GreenBlue
-GB522.
-Stacje Meteo SP73 oraz GreenBlue GB522 wyglądają identycznie, poza logotypami
-marki.
+Windows is currently not supported, but I may work on it in the future.
+(possibly using the Gnulib library).
 
-Program działa pod kontrolą GNU/Linuksa, w tym także DD-WRT. Powinien zadziałać
-bez problemu na Raspberry Pi. Nie był testowany na OpenWRT, jednak dostosowanie
-go do tego środowiska powinno być proste.
+Configuring the weather station
+-------------------------------
 
-Przeniesienie na Windowsa (przy użyciu MinGW) wymagałoby pewnej ilości pracy,
-jednak z użyciem biblioteki Gnulib też mogłoby być stosunkowo proste.
+If the weather station has not already been connected to a WiFi network:
 
-Program jest oparty na pracy wykonanej przez Pana Łukasza Kalamłackiego, który
-wykonał analizę wsteczną protokołu stacji:
-http://kalamlacki.eu/sp73.php
-
-Raporty z używania programu mile widziane - przez bug report na GitHubie lub
-mail na mat.jonczyk w domenie o2.pl.
-
-## Opis konfiguracji stacji
-
-
-Formaty wyjścia programu (JSON, CSV) mogą się zmienić w przyszłej wersji.
-
-
-To configure the weather station:
-
-1. Press the "WIFI / UP" button for three seconds. The "AP" text will be shown
-   on the weather station display (in the place where day of week is shown) and
-   it will start flashing.
+1. Press the "WIFI / UP" button on the back of the device for three seconds.
+   The "AP" text will appear on the weather station display (in the place
+   where the day of week is usually shown).
 2. Connect to the WiFi network called "LivingSmart".
 3. Open in a web browser the address http://11.11.11.254/. Be patient - the
    WebGUI is *very* slow and can take up to several minutes to load.
 4. Login using "admin" / "admin" credentials. The menu is all in Chinese, but
    the identifiers in the HTML code are in English. An online translator may
    also help.
-5. If the device is not already connected to the WiFi network, select "STA设置"
-   in the menu on the left hand side and set WiFi settings.
-6. In the menu on the left hand side, select "其他设置". After a while a new
+5. Select "STA设置" in the menu on the left hand side and wait until the page
+   will fully load (the version number will appear on the top then).
+6. Press "搜索" in the top row on the right. Select the appropriate WiFi access
+   point (typing in the name in the text field may not work).
+7. Configure other settings. It may be a good idea to disable DHCP
+   ("自动获得IP地址" = Disable) and type in an incorrect gateway ("网关地址").
+   This way the device will be able to access only the local network.
+   Of course, access could also be blocked on a firewall.
+8. Submit the form, then on the next screen choose "重启" ("restart, reboot").
+   It seems that it is the WiFi module that is restarted, not the whole weather
+   station.
+9. Again press the "WIFI/UP" button for three seconds - until the "AP" text will
+   be replaced with the day of week.
+
+After the device has been connected to the WiFi network:
+
+1. Open in a web browser the IP address of the device.
+2. Login using "admin"/"admin" credentials.
+3. In the menu on the left hand side, select "其他设置". After a while a new
    window will load, wait till is loaded fully and some values will show in the
    form. In the bottom there is an option to specify server ("服务器地址",
    default value "SMARTSERVER.EMAXTIME.CN") and port number ("端口", default
    value 17000) to which the device will send sensor data.
-7. After submitting the form, choose "重启" ("restart, reboot").
-   It seems that it is the WiFi module that is restarted, not the whole weather
-   station.
-8. Again press the "WIFI/UP" button for three seconds - until the "AP" text will
-   be replaced with the day of week.
+4. Submit the form, then select "重启" ("restart, reboot").
 
 When the weather station WiFi module is running in the Access Point mode, the
 WebGUI is very sluggish, but in STA mode (when connected to a WiFi network as a
@@ -81,6 +77,14 @@ client device) it responds much faster.
 
 Probably the device does not send measurement packets in Access Point mode.
 
+It seems likely that after a power cycle the reporting server is reset to the
+default value and has to be set again. In the future, I may write a script to
+reconfigure the device automatically if this occurs.
+
+Take care not to modify the serial port settings in the configuration interface
+(they are above the knobs to specify the reporting servers) as this may make
+the device inoperable. Also, the WebGUI has an option that allows to reset the
+settings. IMHO, Doing this may be risky, however.
 
 
 ## General remarks on weather station use
