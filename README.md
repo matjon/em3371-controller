@@ -174,6 +174,7 @@ I therefore used `toolchain-mipsel_gcc-linaro_uClibc-0.9.32`, which works correc
 - write proper README.md,
 - reverse engineering:
     - devise a more accurate formula to calculate temperature from raw data,
+      - it appears that the temperature in °F is equal to (raw_data/10)-90
     - describe how `historical1` and `historical2` in `device_single_sensor_data` behave,
     - decode other bytes in packets sent by the device,
     Some versions of the weather station are advertised to contain a DCF77 time
@@ -198,3 +199,6 @@ I therefore used `toolchain-mipsel_gcc-linaro_uClibc-0.9.32`, which works correc
 
 - find other weather stations that should be compatible with this software,
   - searching for "Livingsense" (the mobile app name) may be helpful,
+- dew point calculation: check which parameters to choose when the dry bulb
+  temperature is above 0°C, but the dew point / frost point is below 0°C,
+- change license to GPLv2+, as the MySQL libraries are not compatible with GPLv3.
