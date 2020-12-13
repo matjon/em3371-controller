@@ -20,6 +20,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <math.h>       //isnan(x)
+#include <time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/ip.h>
@@ -60,6 +61,9 @@ struct device_sensor_state {
 	struct device_single_sensor_data remote_sensors[3];
 	// As reported by an internal sensor in the weather station
 	uint16_t atmospheric_pressure;
+
+        // tm_wday, tm_yday are not set
+        struct tm device_time;
 };
 #define DEVICE_INCORRECT_PRESSURE UINT16_MAX
 
