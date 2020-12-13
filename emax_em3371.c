@@ -143,7 +143,7 @@ static bool is_packet_correct(const unsigned char *received_packet,
                 fprintf(stderr, "Incorrect packet checksum\n");
                 return false;
         }
-        fprintf(stderr, "Packet is correct\n");
+        fprintf(stderr, "Packet appears valid\n");
         return true;
 }
 
