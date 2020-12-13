@@ -20,21 +20,19 @@
 void display_CSV_header(FILE *stream)
 {
         fputs("time;atmospheric_pressure;"
-                "station_temp;station_temp_raw;station_humidity;station_dew_point;"
-                "sensor1_temp;sensor1_temp_raw;sensor1_humidity;sensor1_dew_point;"
-                "sensor2_temp;sensor2_temp_raw;sensor2_humidity;sensor2_dew_point;"
-                "sensor3_temp;sensor3_temp_raw;sensor3_humidity;sensor3_dew_point;"
+                "station_temp;station_humidity;station_dew_point;"
+                "sensor1_temp;sensor1_humidity;sensor1_dew_point;"
+                "sensor2_temp;sensor2_humidity;sensor2_dew_point;"
+                "sensor3_temp;sensor3_humidity;sensor3_dew_point;"
                 "\n", stream);
 }
 
 static void display_single_measurement_CSV(FILE *stream, const struct device_single_measurement *state)
 {
         if (DEVICE_IS_INCORRECT_TEMPERATURE(state->temperature)) {
-                fprintf(stream, ";;");
+                fprintf(stream, ";");
         } else {
-		fprintf(stream, "%.2f;%d;",
-			(double) state->temperature, (int) state->raw_temperature
-                        );
+		fprintf(stream, "%.2f;", (double) state->temperature);
         }
 
         if (state->humidity == DEVICE_INCORRECT_HUMIDITY) {
