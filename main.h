@@ -19,6 +19,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/ip.h>
@@ -37,6 +38,8 @@ struct program_options {
         char *status_file_path;
 };
 
-void current_time_to_string(char *time_out, size_t buffer_size, bool apply_timezone);
+void tm_to_string(const struct tm *time_tm, char *time_out,
+                const size_t buffer_size);
+void current_time_to_string(char *time_out, const size_t buffer_size, bool apply_timezone);
 int send_udp_packet(int udp_socket, const struct sockaddr_in *packet_source, const unsigned char *received_packet, const size_t received_packet_size);
 void dump_incoming_packet(FILE *stream, const struct sockaddr_in *packet_source, const unsigned char *received_packet, const size_t received_packet_size);

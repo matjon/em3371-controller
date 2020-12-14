@@ -120,9 +120,17 @@ static void initialize_timezone()
 	tzset();
 }
 
-// Displays local time converted to a string
+void tm_to_string(const struct tm *time_tm, char *time_out,
+                const size_t buffer_size)
+{
+	// Time should be in a format that LibreOffice is able to understand
+	strftime(time_out, buffer_size, "%Y-%m-%d %H:%M:%S", time_tm);
+}
+
+// Displays current time converted to a string - either local time or time in
+// GMT, depending on the apply_timezone parameter.
 // Call initialize_timezone() once before using this function.
-void current_time_to_string(char *time_out, size_t buffer_size,
+void current_time_to_string(char *time_out, const size_t buffer_size,
                 bool apply_timezone)
 {
 	time_t current_time = time(NULL);
@@ -134,9 +142,9 @@ void current_time_to_string(char *time_out, size_t buffer_size,
                 gmtime_r(&current_time, &current_time_tm);
         }
 
-	// Time should be in a format that LibreOffice is able to understand
-	strftime(time_out, buffer_size, "%Y-%m-%d %H:%M:%S", &current_time_tm);
+        tm_to_string(&current_time_tm, time_out, buffer_size);
 }
+
 
 static void hexdump_buffer(FILE *stream, const unsigned char *buffer,
                 size_t buffer_size, const int bytes_per_line)
