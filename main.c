@@ -122,7 +122,7 @@ static void initialize_timezone()
 
 // Displays local time converted to a string
 // Call initialize_timezone() once before using this function.
-void current_time_to_string(char *time_out, char buffer_size,
+void current_time_to_string(char *time_out, size_t buffer_size,
                 bool apply_timezone)
 {
 	time_t current_time = time(NULL);
