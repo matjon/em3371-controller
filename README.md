@@ -3,10 +3,10 @@ Program to capture data from some LivingSense-compatible weather stations
 
 A program to receive and decode network traffic from some WiFi-enabled weather
 stations - the many rebranded versions of EMAX EM3371:
-        - Meteo SP73,
-        - GreenBlue GB522,
-        - Meteo Logic EM3371,
-        - DIGOO DG-EX001.
+- Meteo SP73,
+- GreenBlue GB522,
+- Meteo Logic EM3371,
+- DIGOO DG-EX001.
 
 This program has been tested on a Meteo SP73 weather station, which was bought
 in late 2020. It is based on reverse-engineering work performed by Mr Łukasz
