@@ -20,6 +20,7 @@
 #include "psychrometrics.h"
 #include "output_json.h"
 #include "output_csv.h"
+#include "output_sql.h"
 
 #include <stdlib.h>
 #include <stdio.h>

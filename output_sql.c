@@ -19,6 +19,38 @@
 #include "output_sql.h"
 #include "main.h"
 
+void display_sensor_reading_sql(FILE *stream, const int sensor_id,
+                const struct device_single_measurement *measurement)
+{
+        fputs("INSERT INTO sensor_reading(metrics_state_id, sensor_id", stream);
+
+                if (!DEVICE_IS_INCORRECT_TEMPERATURE(measurement->temperature)) {
+                        fputs(", temperature", stream);
+                }
+
+                if (measurement->humidity != DEVICE_INCORRECT_HUMIDITY) {
+                        fputs(", humidity", stream);
+                }
+
+                if (!DEVICE_IS_INCORRECT_TEMPERATURE(measurement->dew_point)) {
+                        fputs(", dew_point", stream);
+                }
+
+        fprintf(stream, ") VALUES (@insert_id, %d", sensor_id);
+                if (!DEVICE_IS_INCORRECT_TEMPERATURE(measurement->temperature)) {
+                        fprintf(stream, ", %.2f", measurement->temperature);
+                }
+
+                if (measurement->humidity != DEVICE_INCORRECT_HUMIDITY) {
+                        fprintf(stream, ", %d", measurement->humidity);
+                }
+
+                if (!DEVICE_IS_INCORRECT_TEMPERATURE(measurement->dew_point)) {
+                        fprintf(stream, ", %.2f", measurement->dew_point);
+                }
+        fputs(");\n", stream);
+}
+
 void display_sensor_state_sql(FILE *stream, const struct device_sensor_state *state)
 {
 	char current_time[30];
@@ -34,27 +66,21 @@ void display_sensor_state_sql(FILE *stream, const struct device_sensor_state *st
 //
 //      When the data disappears when zooming in, this is likely to be a timezone issue.
 
-        fprintf(stream, "INSERT INTO weather_data("
-                                "time,atmospheric_pressure,"
-                                "station_temp,station_humidity,station_dew_point,"
-                                "sensor1_temp,sensor1_humidity,sensor1_dew_point) "
-                "VALUES ('%s+00:00',%d, "
-                        "%.2f, %d, %.2f,"
-                        "%.2f, %d, %.2f) "
-                "ON DUPLICATE KEY UPDATE time=time;\n",
-                current_time,
-                state->atmospheric_pressure,
+        fprintf(stream, "START TRANSACTION;\n");
+        fprintf(stream, "INSERT INTO metrics_state(time_utc) VALUES ('%s'); \n", current_time);
+        fprintf(stream, "SET @insert_id = LAST_INSERT_ID();\n");
+        if (state->station_sensor.any_data_present) {
+                display_sensor_reading_sql(stream, 0,
+                                &state->station_sensor.current);
+        }
+        for (int i=0; i<3; i++) {
+                if (state->remote_sensors[i].any_data_present) {
+                        display_sensor_reading_sql(stream, i+1,
+                                &state->remote_sensors[i].current);
+                }
+        }
 
-                state->station_sensor.current.temperature,
-                state->station_sensor.current.humidity,
-                state->station_sensor.current.dew_point,
-                state->remote_sensors[0].current.temperature,
-                state->remote_sensors[0].current.humidity,
-                state->remote_sensors[0].current.dew_point
-                );
-
-// The clause "ON DUPLICATE KEY UPDATE time=time" above allows
-// to reload the SQL file
+        fprintf(stream, "COMMIT;\n");
 
         fflush(stream);
 
