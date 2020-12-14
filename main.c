@@ -122,12 +122,17 @@ static void initialize_timezone()
 
 // Displays local time converted to a string
 // Call initialize_timezone() once before using this function.
-void current_time_to_string(char *time_out, char buffer_size)
+void current_time_to_string(char *time_out, char buffer_size,
+                bool apply_timezone)
 {
 	time_t current_time = time(NULL);
 	struct tm current_time_tm;
 
-	localtime_r(&current_time, &current_time_tm);
+        if (apply_timezone) {
+                localtime_r(&current_time, &current_time_tm);
+        } else {
+                gmtime_r(&current_time, &current_time_tm);
+        }
 
 	// Time should be in a format that LibreOffice is able to understand
 	strftime(time_out, buffer_size, "%Y-%m-%d %H:%M:%S", &current_time_tm);
@@ -170,7 +175,7 @@ void dump_incoming_packet(FILE *stream, const struct sockaddr_in *packet_source,
 {
 	char *packet_source_text = packet_source_to_string(packet_source);
 	char current_time[30];
-	current_time_to_string(current_time, sizeof(current_time));
+	current_time_to_string(current_time, sizeof(current_time), true);
 
 	fprintf(stream, "%s received a packet from %s :\n", current_time, packet_source_text);
 

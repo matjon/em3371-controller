@@ -52,7 +52,7 @@ static void display_single_measurement_CSV(FILE *stream, const struct device_sin
 void display_sensor_state_CSV(FILE *stream, const struct device_sensor_state *state)
 {
 	char current_time[30];
-	current_time_to_string(current_time, sizeof(current_time));
+	current_time_to_string(current_time, sizeof(current_time), true);
 
         fprintf(stream, "%s;%d;", current_time, state->atmospheric_pressure);
         display_single_measurement_CSV(stream, &(state->station_sensor.current));
