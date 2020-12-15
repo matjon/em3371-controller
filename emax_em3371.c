@@ -33,6 +33,11 @@
  * Therefore I'm parsing the packet by hand.
  */
 
+static float fahrenheit_to_celcius(float temperature_fahrenheit)
+{
+        return (temperature_fahrenheit - 32.) * 5./9.;
+}
+
 /*
  * Accesses three bytes from raw_data.
  * Returns true if at least some data is present.
@@ -55,17 +60,14 @@ static bool decode_single_measurement(struct device_single_measurement *measurem
 		uint16_t raw_temperature = raw_data[0] + ((int)raw_data[1]) * 256;
 		measurement->raw_temperature = raw_temperature;
 
-		// The reverse engineering document contains the following formula for
-		// calculating the real value of the temperature:
-		// 	 f(x) = 0,0553127*x - 67,494980
-		// The origin of both numbers is, however, not described. They may
-		// have been obtained from lineal regression or something similar.
-		//
-		// It may be possible that the device sends the value in degrees Fahrenheit
-		// multiplied by 10 with some offset.
-		//
-		// TODO: obtain more accurate formula
-		measurement->temperature = 0.0553127 * (float)raw_temperature - 67.494980;
+		// The device sends temperature in degrees Fahrenheit
+                // modified by a linear function.
+                //
+                // When the device is configured to display temperature in °F,
+                // the temperature calculated this way matches exactly the one
+                // displayed on the device's screen.
+                float temperature_fahrenheit = (float) raw_temperature / 10 - 90;
+		measurement->temperature = fahrenheit_to_celcius(temperature_fahrenheit);
 	}
 
 	if (raw_data[2] == 0xff) {
