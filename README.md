@@ -92,6 +92,10 @@ settings. IMHO, Doing this may be risky, however.
 A good guide on weather station sensor placement can be found at
         https://www.wunderground.com/pws/installation-guide
 
+The wireless sensor really cannot be put anywhere where it receives sunlight -
+it is black and heats up much in this case. It reported temperature up to 28°C
+in winter.
+
 ## Compilation for DD-WRT
 
 It is necessary to use a toolchain that links code with the C library used in the DD-WRT build,
@@ -151,8 +155,6 @@ I therefore used `toolchain-mipsel_gcc-linaro_uClibc-0.9.32`, which works correc
 - handle '--help' command line parameter,
 - write proper README.md,
 - reverse engineering:
-    - devise a more accurate formula to calculate temperature from raw data,
-      - it appears that the temperature in °F is equal to (raw_data/10)-90
     - describe how `historical1` and `historical2` in `device_single_sensor_data` behave,
     - decode other bytes in packets sent by the device,
     Some versions of the weather station are advertised to contain a DCF77 time
