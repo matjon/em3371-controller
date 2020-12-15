@@ -23,6 +23,7 @@
 #include "output_sql.h"
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -44,7 +45,8 @@ static float fahrenheit_to_celcius(float temperature_fahrenheit)
  * Returns true if at least some data is present.
  */
 static bool decode_single_measurement(struct device_single_measurement *measurement,
-		const unsigned char *raw_data)
+		const unsigned char *raw_data,
+                bool calculate_dew_point)
 {
 	if (raw_data[0] == 0xff && raw_data[1] == 0xff && raw_data[2] == 0xff) {
 		measurement->humidity = DEVICE_INCORRECT_HUMIDITY;
@@ -81,8 +83,13 @@ static bool decode_single_measurement(struct device_single_measurement *measurem
         // handle data presentation, but is done here for performance reasons.
         // It is a time-consuming calculation on devices with software floating
         // point emulation.
-        if (measurement->humidity != DEVICE_INCORRECT_HUMIDITY &&
-                !DEVICE_IS_INCORRECT_TEMPERATURE(measurement->temperature)) {
+        //
+        // Calculating dew point for min/max measurements does not make
+        // sense as min humidity and min temperature do not correspond to each
+        // other (they were not taken at the same time).
+        if (measurement->humidity != DEVICE_INCORRECT_HUMIDITY
+                && !DEVICE_IS_INCORRECT_TEMPERATURE(measurement->temperature)
+                && calculate_dew_point) {
 
                 measurement->dew_point =
                         dew_point(measurement->temperature, measurement->humidity);
@@ -96,9 +103,12 @@ static bool decode_single_measurement(struct device_single_measurement *measurem
 static bool decode_single_sensor_data(struct device_single_sensor_data *out,
 		const unsigned char *raw_data)
 {
-	bool have_current_data = decode_single_measurement(&(out->current), raw_data);
-	bool have_historical1_data = decode_single_measurement(&(out->historical1), raw_data + 3);
-	bool have_historical2_data = decode_single_measurement(&(out->historical2), raw_data + 6);
+	bool have_current_data =
+                decode_single_measurement(&(out->current),     raw_data, true);
+	bool have_historical1_data =
+                decode_single_measurement(&(out->historical1), raw_data + 3, false);
+	bool have_historical2_data =
+                decode_single_measurement(&(out->historical2), raw_data + 6, false);
 
 	out->any_data_present = have_current_data || have_historical1_data || have_historical2_data;
 
