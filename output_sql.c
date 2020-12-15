@@ -56,6 +56,9 @@ void display_sensor_state_sql(FILE *stream, const struct device_sensor_state *st
 	char current_time[30];
 	current_time_to_string(current_time, sizeof(current_time), false);
 
+	char device_time_str[30];
+	tm_to_string(&(state->device_time), device_time_str, sizeof(device_time_str));
+
 // TODO: Grafana really requires time stored in the database to be in UTC timezone:
 //
 //      https://community.grafana.com/t/preset-time-frames-broken-shows-no-data-points-date-is-5-hours-ahead/10683/9
@@ -67,7 +70,10 @@ void display_sensor_state_sql(FILE *stream, const struct device_sensor_state *st
 //      When the data disappears when zooming in, this is likely to be a timezone issue.
 
         fprintf(stream, "START TRANSACTION;\n");
-        fprintf(stream, "INSERT INTO metrics_state(time_utc) VALUES ('%s'); \n", current_time);
+        fprintf(stream, "INSERT INTO metrics_state(time_utc, device_time) "
+                        "VALUES ('%s', '%s'); \n",
+                        current_time, device_time_str);
+
         fprintf(stream, "SET @insert_id = LAST_INSERT_ID();\n");
         if (state->station_sensor.any_data_present) {
                 display_sensor_reading_sql(stream, 0,
