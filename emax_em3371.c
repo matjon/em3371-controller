@@ -22,6 +22,7 @@
 #include "output_csv.h"
 #include "output_sql.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -109,6 +110,11 @@ static void decode_device_time(struct device_sensor_state *state,
                 const unsigned char *received_packet,
 		const size_t received_packet_size)
 {
+        if (received_packet_size <= 0x13) {
+                assert(false);
+                return;
+        }
+
         memset(&(state->device_time), 0, sizeof(state->device_time));
         state->device_time.tm_sec = received_packet[0x13] / 2;
         state->device_time.tm_min = received_packet[0x12];
