@@ -105,25 +105,10 @@ static bool decode_single_sensor_data(struct device_single_sensor_data *out,
 	return out->any_data_present;
 }
 
-static void decode_sensor_state(struct device_sensor_state *state, const unsigned char *received_packet,
+static void decode_device_time(struct device_sensor_state *state,
+                const unsigned char *received_packet,
 		const size_t received_packet_size)
 {
-	if (received_packet_size <= 61) {
-		fprintf(stderr, "Packet is too short!\n");
-		return;
-	}
-
-	decode_single_sensor_data(&(state->station_sensor), received_packet + 21);
-	for (int i = 0; i < 3; i++) {
-		decode_single_sensor_data(&(state->remote_sensors[i]), received_packet + 30 + i*9);
-	}
-
-	if (received_packet[59] == 0xff && received_packet[60] == 0xff) {
-		state->atmospheric_pressure = DEVICE_INCORRECT_PRESSURE;
-	} else {
-		state->atmospheric_pressure = received_packet[59] + received_packet[60]*256;
-	}
-
         memset(&(state->device_time), 0, sizeof(state->device_time));
         state->device_time.tm_sec = received_packet[0x13] / 2;
         state->device_time.tm_min = received_packet[0x12];
@@ -149,6 +134,28 @@ static void decode_sensor_state(struct device_sensor_state *state, const unsigne
                 state->device_time.tm_sec -= 60;
         }
         mktime(&state->device_time);
+}
+
+static void decode_sensor_state(struct device_sensor_state *state, const unsigned char *received_packet,
+		const size_t received_packet_size)
+{
+	if (received_packet_size <= 61) {
+		fprintf(stderr, "Packet is too short!\n");
+		return;
+	}
+
+	decode_single_sensor_data(&(state->station_sensor), received_packet + 21);
+	for (int i = 0; i < 3; i++) {
+		decode_single_sensor_data(&(state->remote_sensors[i]), received_packet + 30 + i*9);
+	}
+
+	if (received_packet[59] == 0xff && received_packet[60] == 0xff) {
+		state->atmospheric_pressure = DEVICE_INCORRECT_PRESSURE;
+	} else {
+		state->atmospheric_pressure = received_packet[59] + received_packet[60]*256;
+	}
+
+        decode_device_time(state, received_packet, received_packet_size);
 }
 
 static bool is_packet_correct(const unsigned char *received_packet,
