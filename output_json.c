@@ -65,10 +65,10 @@ void display_sensor_state_json(FILE *stream, const struct device_sensor_state *s
 {
 	fputs("{ ", stream);
 
-	char current_time_str[30];
-	tm_to_string(&(state->device_time), current_time_str, sizeof(current_time_str));
+	char device_time_str[30];
+	tm_to_string(&(state->device_time), device_time_str, sizeof(device_time_str));
 
-        fprintf(stream, "\"device_time\": \"%s\",\n", current_time_str);
+        fprintf(stream, "\"device_time\": \"%s\",\n", device_time_str);
 	if (state->atmospheric_pressure != DEVICE_INCORRECT_PRESSURE) {
 		fprintf(stream, "\"atmospheric_pressure\": %u,\n", state->atmospheric_pressure);
 	}
