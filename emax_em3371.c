@@ -59,7 +59,6 @@ static bool decode_single_measurement(struct device_single_measurement *measurem
 	} else {
 		// Trying to be endianness-agnostic
 		uint16_t raw_temperature = raw_data[0] + ((int)raw_data[1]) * 256;
-		measurement->raw_temperature = raw_temperature;
 
 		// The device sends temperature in degrees Fahrenheit
                 // modified by a linear function.

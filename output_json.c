@@ -26,8 +26,8 @@ static void display_single_measurement_json(FILE *stream, const struct device_si
 	fprintf(stream, "{");
 
 	if (!DEVICE_IS_INCORRECT_TEMPERATURE(state->temperature)) {
-		fprintf(stream, " \"temperature\": %.2f, \"raw_temperature\": %d",
-			(double) state->temperature, (int) state->raw_temperature);
+		fprintf(stream, " \"temperature\": %.2f",
+			(double) state->temperature);
 
                 if (state->humidity != DEVICE_INCORRECT_HUMIDITY) {
                         fputs(",", stream);

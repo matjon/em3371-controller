@@ -29,8 +29,6 @@
 
 struct device_single_measurement {
 	float temperature;
-	// Raw temperature as sent by the device - for reverse engineering
-	uint16_t raw_temperature;
 	uint16_t humidity;
         float dew_point;
 };
