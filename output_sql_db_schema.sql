@@ -19,7 +19,11 @@ CREATE TABLE IF NOT EXISTS sensor_reading (
         ON DELETE cascade
 );
 
-CREATE TABLE IF NOT EXISTS metrics_state_debug (
+
+--------------------------------------------------------------------
+-- The tables below are work in progress
+
+CREATE TABLE IF NOT EXISTS device_packet_debug (
    metrics_state_id     INTEGER NOT NULL PRIMARY KEY,
 -- TODO
    FOREIGN KEY(metrics_state_id) 
@@ -30,7 +34,6 @@ CREATE TABLE IF NOT EXISTS metrics_state_debug (
 CREATE TABLE IF NOT EXISTS sensor_state_debug(
    metrics_state_id     INTEGER NOT NULL,
    sensor_id            SMALLINT NOT NULL,
-   temperature_raw      SMALLINT,
    temperature_min      NUMERIC(5,2),
    temperature_max      NUMERIC(5,2),
    humidity_min         SMALLINT,
