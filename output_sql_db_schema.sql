@@ -14,7 +14,20 @@ CREATE TABLE IF NOT EXISTS sensor_reading (
    humidity             SMALLINT,
    dew_point            NUMERIC(5,2),
    PRIMARY KEY(metrics_state_id, sensor_id),
-   FOREIGN KEY(metrics_state_id) 
+   FOREIGN KEY(metrics_state_id)
+        REFERENCES metrics_state(metrics_state_id)
+        ON DELETE cascade
+);
+
+CREATE TABLE IF NOT EXISTS sensor_reading_debug(
+   metrics_state_id     INTEGER NOT NULL,
+   sensor_id            SMALLINT NOT NULL,
+   temperature_min      NUMERIC(5,2),
+   temperature_max      NUMERIC(5,2),
+   humidity_min         SMALLINT,
+   humidity_max         SMALLINT,
+   PRIMARY KEY(metrics_state_id, sensor_id),
+   FOREIGN KEY(metrics_state_id)
         REFERENCES metrics_state(metrics_state_id)
         ON DELETE cascade
 );
@@ -26,20 +39,8 @@ CREATE TABLE IF NOT EXISTS sensor_reading (
 CREATE TABLE IF NOT EXISTS device_packet_debug (
    metrics_state_id     INTEGER NOT NULL PRIMARY KEY,
 -- TODO
-   FOREIGN KEY(metrics_state_id) 
+   FOREIGN KEY(metrics_state_id)
         REFERENCES metrics_state(metrics_state_id)
         ON DELETE cascade
 );
 
-CREATE TABLE IF NOT EXISTS sensor_state_debug(
-   metrics_state_id     INTEGER NOT NULL,
-   sensor_id            SMALLINT NOT NULL,
-   temperature_min      NUMERIC(5,2),
-   temperature_max      NUMERIC(5,2),
-   humidity_min         SMALLINT,
-   humidity_max         SMALLINT,
-   PRIMARY KEY(metrics_state_id, metrics_state),
-   FOREIGN KEY(metrics_state_id) 
-        REFERENCES metrics_state(metrics_state_id)
-        ON DELETE cascade
-);

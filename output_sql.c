@@ -19,6 +19,48 @@
 #include "output_sql.h"
 #include "main.h"
 
+void display_sensor_state_debug(FILE *stream, const int sensor_id,
+                const struct device_single_sensor_data *sensor_data)
+{
+        fputs("INSERT INTO sensor_reading_debug(metrics_state_id, sensor_id", stream);
+
+                if (!DEVICE_IS_INCORRECT_TEMPERATURE(sensor_data->historical2.temperature)) {
+                        fputs(", temperature_min", stream);
+                }
+
+                if (!DEVICE_IS_INCORRECT_TEMPERATURE(sensor_data->historical1.temperature)) {
+                        fputs(", temperature_max", stream);
+                }
+
+                if (sensor_data->historical2.humidity != DEVICE_INCORRECT_HUMIDITY) {
+                        fputs(", humidity_min", stream);
+                }
+
+                if (sensor_data->historical1.humidity != DEVICE_INCORRECT_HUMIDITY) {
+                        fputs(", humidity_max", stream);
+                }
+
+        fprintf(stream, ") VALUES (@insert_id, %d", sensor_id);
+
+                if (!DEVICE_IS_INCORRECT_TEMPERATURE(sensor_data->historical2.temperature)) {
+                        fprintf(stream, ", %.2f", sensor_data->historical2.temperature);
+                }
+
+                if (!DEVICE_IS_INCORRECT_TEMPERATURE(sensor_data->historical1.temperature)) {
+                        fprintf(stream, ", %.2f", sensor_data->historical1.temperature);
+                }
+
+                if (sensor_data->historical2.humidity != DEVICE_INCORRECT_HUMIDITY) {
+                        fprintf(stream, ", %d", sensor_data->historical2.humidity);
+                }
+
+                if (sensor_data->historical1.humidity != DEVICE_INCORRECT_HUMIDITY) {
+                        fprintf(stream, ", %d", sensor_data->historical1.humidity);
+                }
+
+        fputs(");\n", stream);
+}
+
 void display_sensor_reading_sql(FILE *stream, const int sensor_id,
                 const struct device_single_measurement *measurement)
 {
@@ -78,11 +120,14 @@ void display_sensor_state_sql(FILE *stream, const struct device_sensor_state *st
         if (state->station_sensor.any_data_present) {
                 display_sensor_reading_sql(stream, 0,
                                 &state->station_sensor.current);
+                display_sensor_state_debug(stream, 0, &state->station_sensor);
         }
         for (int i=0; i<3; i++) {
                 if (state->remote_sensors[i].any_data_present) {
                         display_sensor_reading_sql(stream, i+1,
                                 &state->remote_sensors[i].current);
+
+                        display_sensor_state_debug(stream, i+1, &state->remote_sensors[i]);
                 }
         }
 
