@@ -138,7 +138,7 @@ static void decode_sensor_state(struct device_sensor_state *state, const unsigne
         // "2020-12-15 11:00:00".
         // This caused a SQL error when inserting into a DATETIME field.
         //
-        // mktime() should correct this, according to documentation.
+        // mktime() should correct this, according to the documentation.
 
         // If the second part is equal to 60, mktime() may handle this as a leap
         // second, which would be an error (the weather station most probably
