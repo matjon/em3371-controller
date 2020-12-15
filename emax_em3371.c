@@ -132,6 +132,23 @@ static void decode_sensor_state(struct device_sensor_state *state, const unsigne
         state->device_time.tm_mon = received_packet[0x0f]-1;
         state->device_time.tm_year = received_packet[0x0e]+100;
         state->device_time.tm_isdst = -1; // information not available
+
+
+        // I received a date "2020-12-15 10:60:00" instead of the expected
+        // "2020-12-15 11:00:00".
+        // This caused a SQL error when inserting into a DATETIME field.
+        //
+        // mktime() should correct this, according to documentation.
+
+        // If the second part is equal to 60, mktime() may handle this as a leap
+        // second, which would be an error (the weather station most probably
+        // does not handle leap seconds).
+        // Therefore I'm correcting it here manually.
+        if (state->device_time.tm_sec >= 60) {
+                state->device_time.tm_min++;
+                state->device_time.tm_sec -= 60;
+        }
+        mktime(&state->device_time);
 }
 
 static bool is_packet_correct(const unsigned char *received_packet,

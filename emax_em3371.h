@@ -62,7 +62,6 @@ struct device_sensor_state {
 	// As reported by an internal sensor in the weather station
 	uint16_t atmospheric_pressure;
 
-        // tm_wday, tm_yday are not set
         struct tm device_time;
 };
 #define DEVICE_INCORRECT_PRESSURE UINT16_MAX
