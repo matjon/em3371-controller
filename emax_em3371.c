@@ -100,6 +100,38 @@ static bool decode_single_measurement(struct device_single_measurement *measurem
 	return true;
 }
 
+static void check_measurement_ordering(
+        struct device_single_measurement *smaller,
+        struct device_single_measurement *bigger,
+        const char *smaller_description,
+        const char *bigger_description
+        )
+{
+        const float temperature_epsilon = 0.01;
+        if (!DEVICE_IS_INCORRECT_TEMPERATURE(smaller->temperature)
+                && !DEVICE_IS_INCORRECT_TEMPERATURE(bigger->temperature)) {
+                if (smaller->temperature > bigger->temperature + temperature_epsilon) {
+                        fprintf(stderr,
+                                "Warning: %s temperature (%.2f°C) is bigger "
+                                "then %s temperature (%.2f°C).\n",
+                                smaller_description, (double) smaller->temperature,
+                                bigger_description, (double) bigger->temperature
+                                );
+                }
+        }
+
+        if (smaller->humidity != DEVICE_INCORRECT_HUMIDITY
+                && bigger->humidity != DEVICE_INCORRECT_HUMIDITY) {
+                if (smaller->humidity > bigger->humidity) {
+                        fprintf(stderr,
+                                "Warning: %s humidity (%d%%)is bigger "
+                                "then %s humidity (%d%%).\n",
+                                smaller_description, (int) smaller->humidity,
+                                bigger_description, (int) bigger->humidity);
+                }
+        }
+}
+
 static bool decode_single_sensor_data(struct device_single_sensor_data *out,
 		const unsigned char *raw_data)
 {
@@ -112,6 +144,11 @@ static bool decode_single_sensor_data(struct device_single_sensor_data *out,
 
 	out->any_data_present =
                 have_current_data || have_historical_max_data || have_historical_min_data;
+
+        check_measurement_ordering(&out->historical_min, &out->current,
+                        "historical minimum temperature", "current");
+        check_measurement_ordering(&out->current, &out->historical_max,
+                        "current", "historical maximum temperature");
 
 	return out->any_data_present;
 }
