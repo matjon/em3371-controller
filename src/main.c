@@ -16,8 +16,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-// for asprintf()
-#define _GNU_SOURCE
+#define _POSIX_C_SOURCE 200809L
 
 #include "main.h"
 #include "emax_em3371.h"
@@ -298,7 +297,7 @@ static void parse_program_options(const int argc, char **argv,
         };
 
         // Set defaults
-        inet_aton("0.0.0.0", &(options->bind_address));
+        inet_pton(AF_INET, "0.0.0.0", &(options->bind_address));
         options->bind_port = 17000;
 
         options->reply_to_ping_packets = true;
@@ -318,7 +317,7 @@ static void parse_program_options(const int argc, char **argv,
 
                 switch (ret) {
                 case 'a':
-                        if (! inet_aton(optarg, &(options->bind_address))) {
+                        if (inet_pton(AF_INET, optarg, &(options->bind_address)) == 0) {
                                 fputs("Incorrect bind address specified on command line!\n",
                                                 stderr);
                                 exit(1);
