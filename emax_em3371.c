@@ -146,9 +146,9 @@ static bool decode_single_sensor_data(struct device_single_sensor_data *out,
                 have_current_data || have_historical_max_data || have_historical_min_data;
 
         check_measurement_ordering(&out->historical_min, &out->current,
-                        "historical minimum temperature", "current");
+                        "historical minimum", "current");
         check_measurement_ordering(&out->current, &out->historical_max,
-                        "current", "historical maximum temperature");
+                        "current", "historical maximum");
 
 	return out->any_data_present;
 }
