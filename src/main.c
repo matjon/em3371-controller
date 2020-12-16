@@ -51,17 +51,26 @@ volatile int stop_execution_signal = 0;
 // Returned value must be disposed of by free()
 static char *packet_source_to_string(const struct sockaddr_in *packet_source)
 {
-	char *packet_source_string = NULL;
+        const size_t packet_source_string_size = 50;
+	char *packet_source_string = malloc(packet_source_string_size);
+        if (packet_source_string == NULL) {
+                return NULL;
+        }
+
 	int ret = 0;
 
 	if (packet_source->sin_family != AF_INET) {
-		ret = asprintf( &packet_source_string, "(weird src_addr family %ld)",
-                                (long int) packet_source->sin_family);
+		ret = snprintf(packet_source_string,
+                               packet_source_string_size,
+                               "(weird src_addr family %ld)",
+                               (long int) packet_source->sin_family);
 	} else {
 		char *source_ip = inet_ntoa(packet_source->sin_addr);
 		uint16_t source_port = ntohs(packet_source->sin_port);
 
-		ret = asprintf( &packet_source_string, "%s:%d", source_ip, (int) source_port);
+		ret = snprintf(packet_source_string,
+                               packet_source_string_size,
+                               "%s:%d", source_ip, (int) source_port);
 	}
 
 	if (ret == -1)
