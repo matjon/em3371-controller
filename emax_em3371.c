@@ -257,25 +257,6 @@ void init_logging()
         display_CSV_header(stdout);
 }
 
-static void update_status_file(const char *status_file_path,
-                struct device_sensor_state *sensor_state)
-{
-        if (status_file_path == NULL) {
-                return;
-        }
-
-        FILE *status_file = fopen(status_file_path, "w");
-
-        if (status_file == NULL) {
-                perror("Cannot open status file for writing");
-                return;
-        }
-
-        display_sensor_state_json(status_file, sensor_state);
-
-        fclose(status_file);
-}
-
 // Main program logic
 void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_source,
 		const unsigned char *received_packet, const size_t received_packet_size,
