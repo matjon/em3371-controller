@@ -236,9 +236,7 @@ static bool is_packet_correct(const unsigned char *received_packet,
         return true;
 }
 
-
-
-void init_logging()
+void init_device_logic()
 {
         if (nan("") == 0 || !isnan(nan(""))) {
                 //Are there any embedded architectures without support for NaN?
@@ -252,7 +250,10 @@ void init_logging()
                                 "in hardware or software floating point library.\n");
                 exit(1);
         }
+}
 
+void init_logging()
+{
         fprintf(stderr, "Warning: output formats are subject to change\n");
         display_CSV_header(stdout);
 }

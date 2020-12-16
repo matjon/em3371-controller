@@ -381,6 +381,7 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
+        init_device_logic();
         init_logging();
         init_signals();
 
