@@ -216,6 +216,12 @@ int send_udp_packet(int udp_socket, const struct sockaddr_in *destination,
 	return 0;
 }
 
+static void init_logging()
+{
+        fprintf(stderr, "Warning: output formats are subject to change\n");
+        display_CSV_header(stdout);
+}
+
 void handle_decoded_sensor_state(const struct device_sensor_state *sensor_state,
                 const struct program_options *options)
 {

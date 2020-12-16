@@ -252,12 +252,6 @@ void init_device_logic()
         }
 }
 
-void init_logging()
-{
-        fprintf(stderr, "Warning: output formats are subject to change\n");
-        display_CSV_header(stdout);
-}
-
 // Main program logic
 void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_source,
 		const unsigned char *received_packet, const size_t received_packet_size,
