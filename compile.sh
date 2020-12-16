@@ -1,11 +1,11 @@
-SOURCES="main.c emax_em3371.c psychrometrics.c output_json.c output_csv.c output_sql.c"
+SOURCES="src/main.c src/emax_em3371.c src/psychrometrics.c src/output_json.c src/output_csv.c src/output_sql.c"
 OUTPUT_BASE=emax_em3371_decoder
 COMMON_PARAMETERS="-O2 -std=c99 -Wall -Wextra"
 #COMMON_PARAMETERS="-O0 -g -std=c99 -Wall -Wextra"
 
 gcc $COMMON_PARAMETERS $SOURCES -o ${OUTPUT_BASE} -lm
 
-gcc $COMMON_PARAMETERS psychrometrics.c psychrometrics_test.c -o psychrometrics_test -lm
+gcc $COMMON_PARAMETERS src/psychrometrics.c src/psychrometrics_test.c -o psychrometrics_test -lm
 
 
 if [ "$1" == 'dd-wrt' ]; then
@@ -21,13 +21,13 @@ if [ "$1" == 'dd-wrt' ]; then
                 -DBCMWPA2 -pipe -mips32 -mtune=mips32                   \
                 -fno-caller-saves  -mno-branch-likely -msoft-float      \
                 $COMMON_PARAMETERS                                      \
-                $SOURCES -o ${OUTPUT_BASE}_mipsel -lm
+                $SOURCES -o ${OUTPUT_BASE}_mipsel -lm -l:libmariadbclient.a -L.
 
         mipsel-linux-uclibc-gcc                                         \
                 -DBCMWPA2 -pipe -mips32 -mtune=mips32                   \
                 -fno-caller-saves  -mno-branch-likely -msoft-float      \
                 $COMMON_PARAMETERS                                      \
-                psychrometrics.c psychrometrics_test.c                  \
+                src/psychrometrics.c src/psychrometrics_test.c          \
                 -o psychrometrics_test_mipsel -lm
 
         # Additional possible GCC parameters: -minterlink-mips16 -mips16
