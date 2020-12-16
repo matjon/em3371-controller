@@ -47,7 +47,6 @@
 volatile bool stop_execution = false;
 volatile int stop_execution_signal = 0;
 
-// May be thread-unsafe because I use inet_ntoa
 // Returned value must be disposed of by free()
 static char *packet_source_to_string(const struct sockaddr_in *packet_source)
 {
@@ -65,7 +64,18 @@ static char *packet_source_to_string(const struct sockaddr_in *packet_source)
                                "(weird src_addr family %ld)",
                                (long int) packet_source->sin_family);
 	} else {
-		char *source_ip = inet_ntoa(packet_source->sin_addr);
+                char source_ip[INET_ADDRSTRLEN];
+
+                const char *inet_ret = inet_ntop(AF_INET,
+                                &packet_source->sin_addr,
+                                source_ip,
+                                sizeof(source_ip));
+
+                if (inet_ret == NULL) {
+                        perror("Cannot convert source IP address to string");
+                        goto err;
+                }
+
 		uint16_t source_port = ntohs(packet_source->sin_port);
 
 		ret = snprintf(packet_source_string,
@@ -73,10 +83,15 @@ static char *packet_source_to_string(const struct sockaddr_in *packet_source)
                                "%s:%d", source_ip, (int) source_port);
 	}
 
-	if (ret == -1)
-		return NULL;
+	if (ret == -1) {
+                goto err;
+        }
 
 	return packet_source_string;
+
+err:
+        free(packet_source_string);
+        return NULL;
 }
 
 static void initialize_TZ_env()
