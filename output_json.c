@@ -89,7 +89,7 @@ void display_sensor_state_json(FILE *stream, const struct device_sensor_state *s
 }
 
 void update_status_file(const char *status_file_path,
-                struct device_sensor_state *sensor_state)
+                const struct device_sensor_state *sensor_state)
 {
         if (status_file_path == NULL) {
                 return;
