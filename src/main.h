@@ -41,6 +41,7 @@ struct program_options {
 
         char *status_file_path;
 };
+#define DEFAULT_BIND_PORT 17000
 
 void tm_to_string(const struct tm *time_tm, char *time_out,
                 const size_t buffer_size);

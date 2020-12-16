@@ -298,7 +298,7 @@ static void parse_program_options(const int argc, char **argv,
 
         // Set defaults
         inet_pton(AF_INET, "0.0.0.0", &(options->bind_address));
-        options->bind_port = 17000;
+        options->bind_port = DEFAULT_BIND_PORT;
 
         options->reply_to_ping_packets = true;
         options->status_file_path = NULL;
