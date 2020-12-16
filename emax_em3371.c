@@ -285,10 +285,7 @@ void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_so
                 }
 
 		decode_sensor_state(sensor_state, received_packet, received_packet_size);
-		display_sensor_state_json(stderr, sensor_state);
-		display_sensor_state_CSV(stdout, sensor_state);
-
-                update_status_file(options->status_file_path, sensor_state);
+                handle_decoded_sensor_state(sensor_state, options);
 		free(sensor_state);
 	}
 }

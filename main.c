@@ -20,6 +20,9 @@
 
 #include "main.h"
 #include "emax_em3371.h"
+#include "output_json.h"
+#include "output_csv.h"
+#include "output_sql.h"
 
 #include <ctype.h>
 #include <errno.h>
@@ -211,6 +214,15 @@ int send_udp_packet(int udp_socket, const struct sockaddr_in *destination,
 		return -1;
 	}
 	return 0;
+}
+
+void handle_decoded_sensor_state(const struct device_sensor_state *sensor_state,
+                const struct program_options *options)
+{
+        display_sensor_state_json(stderr, sensor_state);
+        display_sensor_state_CSV(stdout, sensor_state);
+        // display_sensor_state_sql(stdout, sensor_state);
+        update_status_file(options->status_file_path, sensor_state);
 }
 
 static void on_interrupt(int signum)

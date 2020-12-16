@@ -17,6 +17,9 @@
 
 #pragma once
 
+struct device_sensor_state;
+#include "main.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <math.h>       //isnan(x)
@@ -25,7 +28,6 @@
 #include <sys/socket.h>
 #include <netinet/ip.h>
 #include <netinet/in.h>
-#include "main.h"
 
 struct device_single_measurement {
 	float temperature;
