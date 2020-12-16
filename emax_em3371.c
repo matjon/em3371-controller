@@ -18,9 +18,6 @@
 #include "emax_em3371.h"
 #include "main.h"
 #include "psychrometrics.h"
-#include "output_json.h"
-#include "output_csv.h"
-#include "output_sql.h"
 
 #include <assert.h>
 #include <stdbool.h>
