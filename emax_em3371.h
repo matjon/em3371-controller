@@ -50,8 +50,8 @@ struct device_single_sensor_data {
 	// some minimum or maximum values, possibly over some time period.
 	//
 	// TODO: check how these variables behave.
-	struct device_single_measurement historical1;
-	struct device_single_measurement historical2;
+	struct device_single_measurement historical_max;
+	struct device_single_measurement historical_min;
 };
 
 struct device_sensor_state {

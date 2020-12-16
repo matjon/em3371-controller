@@ -24,38 +24,38 @@ void display_sensor_state_debug(FILE *stream, const int sensor_id,
 {
         fputs("INSERT INTO sensor_reading_debug(metrics_state_id, sensor_id", stream);
 
-                if (!DEVICE_IS_INCORRECT_TEMPERATURE(sensor_data->historical2.temperature)) {
+                if (!DEVICE_IS_INCORRECT_TEMPERATURE(sensor_data->historical_min.temperature)) {
                         fputs(", temperature_min", stream);
                 }
 
-                if (!DEVICE_IS_INCORRECT_TEMPERATURE(sensor_data->historical1.temperature)) {
+                if (!DEVICE_IS_INCORRECT_TEMPERATURE(sensor_data->historical_max.temperature)) {
                         fputs(", temperature_max", stream);
                 }
 
-                if (sensor_data->historical2.humidity != DEVICE_INCORRECT_HUMIDITY) {
+                if (sensor_data->historical_min.humidity != DEVICE_INCORRECT_HUMIDITY) {
                         fputs(", humidity_min", stream);
                 }
 
-                if (sensor_data->historical1.humidity != DEVICE_INCORRECT_HUMIDITY) {
+                if (sensor_data->historical_max.humidity != DEVICE_INCORRECT_HUMIDITY) {
                         fputs(", humidity_max", stream);
                 }
 
         fprintf(stream, ") VALUES (@insert_id, %d", sensor_id);
 
-                if (!DEVICE_IS_INCORRECT_TEMPERATURE(sensor_data->historical2.temperature)) {
-                        fprintf(stream, ", %.2f", sensor_data->historical2.temperature);
+                if (!DEVICE_IS_INCORRECT_TEMPERATURE(sensor_data->historical_min.temperature)) {
+                        fprintf(stream, ", %.2f", sensor_data->historical_min.temperature);
                 }
 
-                if (!DEVICE_IS_INCORRECT_TEMPERATURE(sensor_data->historical1.temperature)) {
-                        fprintf(stream, ", %.2f", sensor_data->historical1.temperature);
+                if (!DEVICE_IS_INCORRECT_TEMPERATURE(sensor_data->historical_min.temperature)) {
+                        fprintf(stream, ", %.2f", sensor_data->historical_max.temperature);
                 }
 
-                if (sensor_data->historical2.humidity != DEVICE_INCORRECT_HUMIDITY) {
-                        fprintf(stream, ", %d", sensor_data->historical2.humidity);
+                if (sensor_data->historical_min.humidity != DEVICE_INCORRECT_HUMIDITY) {
+                        fprintf(stream, ", %d", sensor_data->historical_min.humidity);
                 }
 
-                if (sensor_data->historical1.humidity != DEVICE_INCORRECT_HUMIDITY) {
-                        fprintf(stream, ", %d", sensor_data->historical1.humidity);
+                if (sensor_data->historical_max.humidity != DEVICE_INCORRECT_HUMIDITY) {
+                        fprintf(stream, ", %d", sensor_data->historical_max.humidity);
                 }
 
         fputs(");\n", stream);

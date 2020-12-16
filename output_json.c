@@ -53,10 +53,10 @@ static void display_single_sensor_json(FILE *stream, const struct device_single_
 	display_single_measurement_json(stream, &(state->current));
 
 	fprintf(stream, ",\n    \"historical1\": ");
-	display_single_measurement_json(stream, &(state->historical1));
+	display_single_measurement_json(stream, &(state->historical_max));
 
 	fprintf(stream, ",\n    \"historical2\": ");
-	display_single_measurement_json(stream, &(state->historical2));
+	display_single_measurement_json(stream, &(state->historical_min));
 
 	fprintf(stream, "\n  }");
 }

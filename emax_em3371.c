@@ -104,13 +104,14 @@ static bool decode_single_sensor_data(struct device_single_sensor_data *out,
 		const unsigned char *raw_data)
 {
 	bool have_current_data =
-                decode_single_measurement(&(out->current),     raw_data, true);
-	bool have_historical1_data =
-                decode_single_measurement(&(out->historical1), raw_data + 3, false);
-	bool have_historical2_data =
-                decode_single_measurement(&(out->historical2), raw_data + 6, false);
+                decode_single_measurement(&(out->current),        raw_data, true);
+	bool have_historical_max_data =
+                decode_single_measurement(&(out->historical_max), raw_data + 3, false);
+	bool have_historical_min_data =
+                decode_single_measurement(&(out->historical_min), raw_data + 6, false);
 
-	out->any_data_present = have_current_data || have_historical1_data || have_historical2_data;
+	out->any_data_present =
+                have_current_data || have_historical_max_data || have_historical_min_data;
 
 	return out->any_data_present;
 }
