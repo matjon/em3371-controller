@@ -181,7 +181,6 @@ I therefore used `toolchain-mipsel_gcc-linaro_uClibc-0.9.32`, which works correc
   - searching for "Livingsense" (the mobile app name) may be helpful,
 - dew point calculation: check which parameters to choose when the dry bulb
   temperature is above 0°C, but the dew point / frost point is below 0°C,
-- change license to GPLv2+, as the MySQL libraries are not compatible with GPLv3.
 
 ## Links
 
