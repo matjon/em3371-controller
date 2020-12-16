@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS metrics_state (
    metrics_state_id     INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
 -- Grafana requires the time column be in the UTC timezone
    time_utc             DATETIME NOT NULL,
-   device_time          DATETIME
+   device_time          DATETIME,
+   INDEX metrics_state_time_index (time_utc)
 );
 
 CREATE TABLE IF NOT EXISTS sensor_reading (
