@@ -296,6 +296,7 @@ static void parse_program_options(const int argc, char **argv,
                 { "port",         required_argument, NULL, 'p' },
                 { "no-reply",     no_argument,       NULL, 'r' },
                 { "status-file",  required_argument, NULL, 's' },
+                { "inject",       no_argument,       NULL, 'i' },
                 {0, 0, 0, 0}
         };
 
@@ -305,6 +306,7 @@ static void parse_program_options(const int argc, char **argv,
 
         options->reply_to_ping_packets = true;
         options->status_file_path = NULL;
+        options->allow_injecting_packets = false;
 
         // The following is vaguely based on the example code in
         // https://www.gnu.org/software/libc/manual/html_node/Getopt-Long-Option-Example.html
@@ -313,7 +315,7 @@ static void parse_program_options(const int argc, char **argv,
                 char *endptr = NULL;
                 long port_number = 0;
 
-                ret = getopt_long (argc, argv, "a:p:rs:", long_options, &option_index);
+                ret = getopt_long (argc, argv, "a:p:rs:i", long_options, &option_index);
                 if (ret == -1) {
                         break;
                 }
@@ -364,7 +366,9 @@ static void parse_program_options(const int argc, char **argv,
                 case 's':
                         options->status_file_path = optarg;
                         break;
-
+                case 'i':
+                        options->allow_injecting_packets = true;
+                        break;
                 case '?':
                         exit(1);
                 default:
@@ -414,7 +418,7 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-        init_device_logic();
+        init_device_logic(&options);
         init_logging();
         init_signals();
 

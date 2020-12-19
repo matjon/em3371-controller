@@ -38,6 +38,7 @@ struct program_options {
         uint16_t bind_port;
 
         bool reply_to_ping_packets;
+        bool allow_injecting_packets;
 
         char *status_file_path;
 };

@@ -33,6 +33,13 @@
 #include <math.h>
 #include <string.h>
 
+//fcntl
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <ctype.h>
+
+
 /*
  * Using packed structs with casting may be unsafe on some architectures:
  * 	https://stackoverflow.com/questions/8568432/is-gccs-attribute-packed-pragma-pack-unsafe
@@ -240,7 +247,7 @@ static bool is_packet_correct(const unsigned char *received_packet,
         return true;
 }
 
-void init_device_logic()
+void init_device_logic(struct program_options *options)
 {
         if (nan("") == 0 || !isnan(nan(""))) {
                 //Are there any embedded architectures without support for NaN?
@@ -253,6 +260,11 @@ void init_device_logic()
                 fprintf(stderr, "ERROR: no support for NaN floating point numbers "
                                 "in hardware or software floating point library.\n");
                 exit(1);
+        }
+
+        if (options->allow_injecting_packets) {
+                int current_flags = fcntl(0, F_GETFL);
+                fcntl(0, F_SETFL, current_flags | O_NONBLOCK);
         }
 }
 
@@ -329,6 +341,76 @@ static void send_timesync_packet(int udp_socket, const struct sockaddr_in *packe
 	dump_packet(stderr, packet_source, buffer, sizeof(buffer), false);
         send_udp_packet(udp_socket, packet_source, buffer, sizeof(buffer));
 }
+unsigned char decode_hex_digit(char digit)
+{
+        digit = tolower(digit);
+        if (isdigit(digit)) {
+                return digit-'0';
+        } else {
+                return digit-'a' + 10;
+        }
+}
+
+bool decode_hex(const char *buffer, unsigned char *out) {
+        if (!isxdigit(*buffer) || *(buffer+1) == 0 || !isxdigit(*(buffer+1))) {
+                return false;
+        }
+
+        *out = decode_hex_digit(*buffer) << 4;
+        *out += decode_hex_digit(*(buffer+1));
+        return true;
+}
+
+static bool inject_packets(int udp_socket, const struct sockaddr_in *packet_source)
+{
+        char hex_buffer[200];
+        char *ret = fgets(hex_buffer, sizeof(hex_buffer), stdin);
+        if (ret == NULL) {
+                if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                        return false;
+                } else {
+                        perror("Reading packets to inject failed!");
+                        return false;
+                }
+        }
+
+        unsigned char output_buffer[100];
+        size_t output_buffer_size = 0;
+        char *hex_buffer_ptr=hex_buffer;
+
+        while (*hex_buffer_ptr != 0 && output_buffer_size < sizeof(output_buffer)) {
+                if (!isxdigit(*hex_buffer_ptr)) {
+                        hex_buffer_ptr++;
+                } else if (decode_hex(hex_buffer_ptr, &output_buffer[output_buffer_size])) {
+                        output_buffer_size++;
+                        hex_buffer_ptr+=2;
+                } else {
+                        hex_buffer_ptr++;
+                }
+        }
+        if (output_buffer_size == 0) {
+                return false;
+        }
+
+        if (output_buffer_size + 2 > sizeof(output_buffer)) {
+                fprintf(stderr, "Packet to inject too big\n");
+                return false;
+        }
+
+        unsigned char sum = 0;
+        for (size_t i=0; i < output_buffer_size; i++) {
+                sum+=output_buffer[i];
+        }
+        output_buffer[output_buffer_size++] = sum;
+        output_buffer[output_buffer_size++] = '>';
+
+
+        fprintf(stderr, "Injecting packet:\n");
+	dump_packet(stderr, packet_source, output_buffer, output_buffer_size, false);
+        send_udp_packet(udp_socket, packet_source, output_buffer, output_buffer_size);
+
+        return true;
+}
 
 
 
@@ -364,6 +446,12 @@ void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_so
 		decode_sensor_state(sensor_state, received_packet, received_packet_size);
                 handle_decoded_sensor_state(sensor_state, options);
 		free(sensor_state);
+
+                if (options->allow_injecting_packets) {
+                        while (inject_packets(udp_socket, packet_source)) {
+                                sleep(1);
+                        }
+                }
 
                         if (!has_timesync_packet_been_sent) {
                                 fputs("Injecting timesync data into the device\n", stderr);
