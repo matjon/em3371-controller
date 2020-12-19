@@ -16,6 +16,12 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+// tm_gmtoff in struct tm
+#define _GNU_SOURCE
+
+// localtime_r
+#define _POSIX_C_SOURCE 200809L
+
 #include "emax_em3371.h"
 #include "main.h"
 #include "psychrometrics.h"
@@ -250,6 +256,84 @@ void init_device_logic()
         }
 }
 
+static void send_timesync_packet(int udp_socket, const struct sockaddr_in *packet_source,
+		const unsigned char *received_packet, const size_t received_packet_size)
+{
+
+
+        if (received_packet_size <= 8) {
+                // TODO: print a warning message
+                return;
+        }
+
+        unsigned char buffer[22];
+
+        memset(buffer, 0, sizeof(buffer));
+        // First 7 bytes contain preamble and last 4 bytes of device's MAC address
+        memcpy(buffer, received_packet, 7);
+        // Setting this to 0x40 causes the device to respond with an error message
+        // same with 0x81
+        buffer[7] = 0x80;
+        //buffer[8] = 0x10;
+        buffer[8] = 0x00;
+        // Other values then 0x01 seem uninteresting
+        //buffer[9] = 0x00;
+        //buffer[9] = 0x03;
+        buffer[9] = 0x01;
+        //setting this to 0x10 or 0x08, or 0x07 causes the device to respond with an error message
+        //buffer[10] = 0x04;
+        //buffer[10] = 0x10;
+        //buffer[10] = 0x07;
+        buffer[10] = 0x08;
+        //Setting this byte to 0x01 does apparently nothing, the device sets this byte to 0x00 in reply
+        //buffer[11] = 0x01;
+        buffer[11] = 0x00;
+
+        time_t current_time = time(NULL);
+        struct tm current_time_tm;
+        localtime_r(&current_time, &current_time_tm);
+
+        // tm_gmtoff is a GNU extension, but also available in uclibc
+        int current_timezone = current_time_tm.tm_gmtoff / 3600;
+
+        // paranoia
+        if (current_timezone < -12) {
+                current_timezone = -12;
+        }
+        if (current_timezone > 12) {
+                current_timezone = 12;
+        }
+
+        // GMT is represented by timezone 0x0c (12 in decimal)
+        buffer[12] = 12 + current_timezone;
+        //buffer[12] = 5;
+
+        buffer[13] = current_time_tm.tm_year - 100;
+        buffer[14] = current_time_tm.tm_mon + 1;
+        buffer[15] = current_time_tm.tm_mday;
+
+        buffer[16] = current_time_tm.tm_hour;
+        buffer[17] = current_time_tm.tm_min;
+        buffer[18] = current_time_tm.tm_sec * 2;
+        //Setting this to 0x01 does apparently nothing interesting
+        //buffer[19] = 0x01;
+        buffer[19] = 0x00;
+
+        unsigned char sum = 0;
+        for (size_t i=0; i < 20; i++) {
+                sum+=buffer[i];
+        }
+        buffer[20] = sum;
+        buffer[21] = '>';
+
+	dump_packet(stderr, packet_source, buffer, sizeof(buffer), false);
+        send_udp_packet(udp_socket, packet_source, buffer, sizeof(buffer));
+}
+
+
+
+static int has_timesync_packet_been_sent = 0;
+
 // Main program logic
 void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_source,
 		const unsigned char *received_packet, const size_t received_packet_size,
@@ -280,5 +364,12 @@ void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_so
 		decode_sensor_state(sensor_state, received_packet, received_packet_size);
                 handle_decoded_sensor_state(sensor_state, options);
 		free(sensor_state);
+
+                        if (!has_timesync_packet_been_sent) {
+                                fputs("Injecting timesync data into the device\n", stderr);
+                                send_timesync_packet(udp_socket, packet_source,
+                                                received_packet, received_packet_size);
+                                has_timesync_packet_been_sent = 1;
+                        }
 	}
 }
