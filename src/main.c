@@ -315,7 +315,7 @@ static void parse_program_options(const int argc, char **argv,
                 char *endptr = NULL;
                 long port_number = 0;
 
-                ret = getopt_long (argc, argv, "a:p:rs:i", long_options, &option_index);
+                ret = getopt_long (argc, argv, "a:p:rs:", long_options, &option_index);
                 if (ret == -1) {
                         break;
                 }
