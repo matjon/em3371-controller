@@ -426,7 +426,9 @@ void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_so
                 return;
         }
 
-	if (received_packet_size < 20) {
+	if (received_packet_size < 20
+                        && received_packet_size > 0x07
+                        && received_packet[0x07] <= 0x01) {
                 if (options->reply_to_ping_packets) {
                         fputs("Handling the received packet "
                                 "as a ping packet, sending it back\n", stderr);
