@@ -71,3 +71,6 @@ void init_device_logic(struct program_options *options);
 void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_source,
 		const unsigned char *received_packet, const size_t received_packet_size,
                 const struct program_options *options);
+
+void fuzz_station(int udp_socket, const struct sockaddr_in *packet_source,
+		unsigned char *received_packet, const size_t received_packet_size);

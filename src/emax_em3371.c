@@ -412,6 +412,46 @@ static bool inject_packets(int udp_socket, const struct sockaddr_in *packet_sour
         return true;
 }
 
+static unsigned char fuzzing_function_no = 0x03;
+
+void fuzz_station(int udp_socket, const struct sockaddr_in *packet_source,
+		unsigned char *received_packet, const size_t received_packet_size)
+{
+        unsigned char output_buffer[300];
+        size_t output_buffer_size = 0;
+
+        // First 7 bytes contain preamble and last 4 bytes of device's MAC address
+        if (received_packet_size <= 8) {
+                // TODO: print a warning message
+                return;
+        }
+        memcpy(output_buffer, received_packet, 7);
+        output_buffer_size=7;
+
+        output_buffer[output_buffer_size++] = fuzzing_function_no++;
+        output_buffer[output_buffer_size++] = 0x00;
+        output_buffer[output_buffer_size++] = 0x00;
+
+        // payload length
+        output_buffer[output_buffer_size++] = 0x0e;
+        output_buffer[output_buffer_size++] = 0x00;
+
+        for (unsigned char i = 0; i < 0x0e; i++) {
+                output_buffer[output_buffer_size++] = (unsigned char) i;
+        }
+
+
+        unsigned char sum = 0;
+        for (size_t i=0; i < output_buffer_size; i++) {
+                sum+=output_buffer[i];
+        }
+        output_buffer[output_buffer_size++] = sum;
+        output_buffer[output_buffer_size++] = '>';
+
+        fprintf(stderr, "Injecting fuzzing packet:\n");
+	dump_packet(stderr, packet_source, output_buffer, output_buffer_size, false);
+        send_udp_packet(udp_socket, packet_source, output_buffer, output_buffer_size);
+}
 
 
 static int has_timesync_packet_been_sent = 0;
@@ -453,6 +493,7 @@ void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_so
                         while (inject_packets(udp_socket, packet_source)) {
                                 sleep(1);
                         }
+                        //fuzz_station(udp_socket, packet_source);
                 }
 
                         if (!has_timesync_packet_been_sent) {
