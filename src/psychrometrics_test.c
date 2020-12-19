@@ -47,10 +47,8 @@ void dew_point_calculation_benchmarks()
         for (int i = 0; i < 100; i++) {
                 // We can't calculate dew point for 0% relative humidity
                 for (int j = 1; j <= 100; j++) {
-                        for (int k = 0; k < 100; k++) {
-                                sum += dew_point(i, j);
-                                calculations_done++;
-                        }
+                        sum += dew_point(i, j);
+                        calculations_done++;
                 }
         }
 
