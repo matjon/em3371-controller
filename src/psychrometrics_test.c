@@ -66,7 +66,7 @@ void dew_point_calculation_benchmarks()
 
 int main()
 {
-        fprintf(stdout, "Small differences are normal as there is some variability in formulas\n");
+        fprintf(stdout, "Small differences are normal as there is some variation in formulas\n");
         fprintf(stdout, "especially at temperatures below 0°C.\n");
         // and values are rounded to 1°F
 
@@ -103,7 +103,7 @@ int main()
 
         dew_point_calculation_benchmarks();
 
-        fprintf(stdout, "Should display \"nan\" and possibly an error message\n");
+        fprintf(stdout, "\n\nShould display \"nan\" and possibly an error message:\n");
 
         print_dew_point( 10, 0, nan(""));
 
