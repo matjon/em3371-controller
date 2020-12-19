@@ -255,7 +255,7 @@ void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_so
 		const unsigned char *received_packet, const size_t received_packet_size,
                 const struct program_options *options)
 {
-	dump_incoming_packet(stderr, packet_source, received_packet, received_packet_size);
+	dump_packet(stderr, packet_source, received_packet, received_packet_size, true);
         if (!is_packet_correct(received_packet, received_packet_size)) {
                 return;
         }

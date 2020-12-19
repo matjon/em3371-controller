@@ -205,14 +205,17 @@ static void hexdump_buffer(FILE *stream, const unsigned char *buffer,
 	}
 }
 
-void dump_incoming_packet(FILE *stream, const struct sockaddr_in *packet_source,
-                const unsigned char *received_packet, const size_t received_packet_size)
+void dump_packet(FILE *stream, const struct sockaddr_in *packet_source,
+        const unsigned char *received_packet, const size_t received_packet_size,
+        bool is_incoming)
 {
 	char *packet_source_text = packet_source_to_string(packet_source);
 	char current_time[30];
 	current_time_to_string(current_time, sizeof(current_time), true);
 
-	fprintf(stream, "%s received a packet from %s :\n", current_time, packet_source_text);
+	fprintf(stream, "%s %s %s :\n", current_time,
+                        is_incoming ? "received a packet from" : "sending a packet to",
+                        packet_source_text);
 
 	hexdump_buffer(stream, received_packet, received_packet_size, 8);
 	free(packet_source_text);
