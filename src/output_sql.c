@@ -21,7 +21,8 @@
 #include "main.h"
 
 void display_sensor_state_debug(FILE *stream, const int sensor_id,
-                const struct device_single_sensor_data *sensor_data)
+                const struct device_single_sensor_data *sensor_data,
+                const unsigned char payload_byte_0x31)
 {
         fputs("INSERT INTO sensor_reading_debug(metrics_state_id, sensor_id", stream);
 
@@ -41,6 +42,10 @@ void display_sensor_state_debug(FILE *stream, const int sensor_id,
                         fputs(", humidity_max", stream);
                 }
 
+                if (sensor_id == 0) {
+                        fputs(", payload_0x31", stream);
+                }
+
         fprintf(stream, ") VALUES (@insert_id, %d", sensor_id);
 
                 if (!DEVICE_IS_INCORRECT_TEMPERATURE(sensor_data->historical_min.temperature)) {
@@ -57,6 +62,10 @@ void display_sensor_state_debug(FILE *stream, const int sensor_id,
 
                 if (sensor_data->historical_max.humidity != DEVICE_INCORRECT_HUMIDITY) {
                         fprintf(stream, ", %d", sensor_data->historical_max.humidity);
+                }
+
+                if (sensor_id == 0) {
+                        fprintf(stream, ", %d", payload_byte_0x31);
                 }
 
         fputs(");\n", stream);
@@ -130,7 +139,8 @@ void display_sensor_state_sql(FILE *stream, const struct device_sensor_state *st
                 display_sensor_reading_sql(stream, 0,
                                 &state->station_sensor.current,
                                 state->atmospheric_pressure);
-                display_sensor_state_debug(stream, 0, &state->station_sensor);
+                display_sensor_state_debug(stream, 0, &state->station_sensor,
+                                state->payload_byte_0x31);
         }
         for (int i=0; i<3; i++) {
                 if (state->remote_sensors[i].any_data_present) {
@@ -138,7 +148,7 @@ void display_sensor_state_sql(FILE *stream, const struct device_sensor_state *st
                                 &state->remote_sensors[i].current,
                                 DEVICE_INCORRECT_PRESSURE);
 
-                        display_sensor_state_debug(stream, i+1, &state->remote_sensors[i]);
+                        display_sensor_state_debug(stream, i+1, &state->remote_sensors[i], 0);
                 }
         }
 

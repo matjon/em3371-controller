@@ -43,12 +43,14 @@ CREATE TABLE IF NOT EXISTS sensor_reading_debug(
    temperature_max      NUMERIC(5,2),
    humidity_min         SMALLINT,
    humidity_max         SMALLINT,
+   payload_0x31         SMALLINT,
    PRIMARY KEY(metrics_state_id, sensor_id),
    FOREIGN KEY(metrics_state_id)
         REFERENCES metrics_state(metrics_state_id)
         ON DELETE cascade
 );
 
+-- ALTER TABLE sensor_reading_debug ADD COLUMN payload_0x31 SMALLINT;
 
 --------------------------------------------------------------------
 -- The tables below are work in progress

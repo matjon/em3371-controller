@@ -219,6 +219,8 @@ static void decode_sensor_state(struct device_sensor_state *state, const unsigne
 		state->atmospheric_pressure = received_packet[59] + received_packet[60]*256;
 	}
 
+        state->payload_byte_0x31 = received_packet[61];
+
         decode_device_time(state, received_packet, received_packet_size);
 }
 
@@ -271,8 +273,6 @@ void init_device_logic(struct program_options *options)
 static void send_timesync_packet(int udp_socket, const struct sockaddr_in *packet_source,
 		const unsigned char *received_packet, const size_t received_packet_size)
 {
-
-
         if (received_packet_size <= 8) {
                 // TODO: print a warning message
                 return;
@@ -341,6 +341,7 @@ static void send_timesync_packet(int udp_socket, const struct sockaddr_in *packe
 	dump_packet(stderr, packet_source, buffer, sizeof(buffer), false);
         send_udp_packet(udp_socket, packet_source, buffer, sizeof(buffer));
 }
+
 unsigned char decode_hex_digit(char digit)
 {
         digit = tolower(digit);

@@ -62,6 +62,8 @@ struct device_sensor_state {
 	struct device_single_sensor_data remote_sensors[3];
 	// As reported by an internal sensor in the weather station
 	uint16_t atmospheric_pressure;
+        // Testing: byte 0x31 of payload may contain atmospheric pressure trend.
+        unsigned char payload_byte_0x31;
 
         struct tm device_time;
 };
