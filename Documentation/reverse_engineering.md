@@ -153,13 +153,13 @@ Function number 0x80 - set weather station clock
 To set the weather station clock, send to it a packet with function code 0x80
 and payload of 8 bytes.
 
-Bytes 0x00-0x06 of this payload should contain current time, they
+Bytes 0x00-0x06 of this payload should contain local time, they
 correspond to bytes 0x01-0x07 of weather station sensor data payload (see
 "Function number 0x01, payload size 0x39" and also discussion there). In
 particular, seconds (in byte 0x06) should also be multiplied by 2.
 
-Byte 0x07 of payload: the server at SMARTSERVER.EMAXTIME.CN sets this byte to
-0x00, other values of this byte seem to do nothing interesting.
+Byte 0x07 of the payload: the server at SMARTSERVER.EMAXTIME.CN sets this byte
+to 0x00, other values of this byte seem to do nothing interesting.
 
 The device should respond with the same packet back (but clears byte 0x08 of
 whole packet (not of the payload), if it was set to 0x01).
