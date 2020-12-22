@@ -54,7 +54,7 @@ Known function numbers:
 | Function number | Payload size  | Description |
 | --------------- | ------------- | ----------- |
 | 0x00            | 0x00          | A ping packet. The program is expected to respond with same packet. |
-| 0x01            | 0x00 or 0x01  | Probably a ping packet also. |
+| 0x01            | 0x00          | Probably a ping packet also. |
 | 0x01            | 0x39          | Weather station sensor data. |
 | 0x02            | response: 0x03 | Unknown. The device responds with a packet with a function number 0x02 and a payload "0xff 0xff 0xff". Possibly some functionality that is not present on the specimen. |
 | 0x20            | response: 0x08 | "Query device time". |
