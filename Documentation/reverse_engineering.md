@@ -109,29 +109,8 @@ Sometimes the device sends incorrect times such as "2020-12-15 10:60:00" instead
 of the expected "2020-12-15 11:00:00", it is necessary to account for this.
 The time is in local timezone, exactly just as is shown on the device's screen.
 
-### Timezone
-
-It is possible to set the timezone manually by pressing the SET button on
-the back of the device for several seconds, then pressing it once. Then use the
-UP and DOWN buttons to change the value.
-According to the manual I got with the weather station, timezone "00"
-corresponds to the Central European Time (GMT+1), but experiments seem to
-contradict this. It looks like timezone "00" corresponds to GMT.
-
-This parameter seems mostly unused, though. It does not survive power cycles of
-the device (like probably all other parameters except for those of the Lierda
-WiFi module). The device always sends time in local timezone.
-
-Byte values of the timezone: GMT is represented by timezone 0x0c (12 in
-decimal). This byte AFAIK can have values from 0x00 (which corresponds to
-GMT-12) to 0x18 (which corresponds to GMT+12).
-
-The SMARTSERVER.EMAXTIME.CN server has set the device to timezone 0x14 (using
-packet with function 0x80), which corresponds to GMT+8, which is the timezone
-used in China. The local device time has been set accordingly with the GMT+8
-offset. This can be annoying for some users. Possibly the server sets the
-correct timezone after using the LivingSense app or remembering the timezone set
-by the user.
+See discussion of timezone in description of "function number 0x80 - set weather
+station clock".
 
 ### Sensor data format
 
@@ -194,6 +173,32 @@ tricks to change this behavior and this was the primary motivation of my fuzzing
 the weather station. I have found no other way around this limitation other
 than querying the station manually using packets with function number 0x90,
 though.
+
+### Timezone
+
+Byte 0x00 of payload of functiono 0x80 contains the desired device timezone.
+
+It is possible to set the timezone manually by pressing the SET button on
+the back of the device for several seconds, then pressing it once. Then use the
+UP and DOWN buttons to change the value.
+According to the manual I got with the weather station, timezone "00"
+corresponds to the Central European Time (GMT+1), but experiments seem to
+contradict this. It looks like timezone "00" corresponds to GMT.
+
+This parameter seems mostly unused, though. It does not survive power cycles of
+the device (like probably all other parameters except for those of the Lierda
+WiFi module). The device always sends time in local timezone.
+
+Byte values of the timezone: GMT is represented by timezone 0x0c (12 in
+decimal). This byte AFAIK can have values from 0x00 (which corresponds to
+GMT-12) to 0x18 (which corresponds to GMT+12).
+
+The SMARTSERVER.EMAXTIME.CN server has set the device to timezone 0x14 (using
+packet with function 0x80), which corresponds to GMT+8, which is the timezone
+used in China. The local device time has been set accordingly with the GMT+8
+offset. This can be annoying for some users. Possibly the server sets the
+correct timezone after using the LivingSense app or remembering the timezone set
+by the user.
 
 Function number 0x90 - query device sensor state
 ------------------------------------------------
