@@ -5,7 +5,7 @@ I was reverse engineering the protocol of a Meteo SP73 weather station
 manufactured in December 2018, but bought in late 2020. The weather station
 contains a Lierda WiFi module.
 
-I was using initial reveng work performed by Mr Łukasz Kalamłacki 
+I was using initial reveng work performed by Mr Łukasz Kalamłacki
 ( http://kalamlacki.eu/sp73.php ) as well as: observations, experiments,
 monitoring communication to/from the EMAX server(s) and fuzzing.
 
@@ -30,7 +30,7 @@ General packet structure
 | 0x03   | 4      | Last 4 bytes of the device's MAC address, most significant byte first. The byte at offset 0x03 is usually 0x69 as Lierda has the MAC address range 00:95:69:XX:XX:XX. |
 | 0x07   | 1      | Function number. Determines the type of payload and/or the operation the receiver should perform. |
 | 0x08   | 2      | Unknown, almost always each byte has value 0x00 or 0x01. Does not seem to matter much. |
-| 0x0a   | 1      | Payload length. |
+| 0x0a   | 1      | `payload_size` - length of the packet payload |
 | 0x0b   | 1      | Unknown, always zero in packets sent by the device. Sometimes other values seem to be ignored, sometimes they trigger an error. |
 | 0x0c   | `payload_size` | Packet payload. |
 | 0x0c + `payload_size`  | 1 | Control sum. A sum (modulo 256) of all bytes from offset 0x00 to (0x0c + `payload_size` - 1) inclusive. |
@@ -41,7 +41,7 @@ These are probably delimiters, ASCII '<' and '>'.
 
 When `payload_size` as specified in byte 0x07 does not match the real size of
 the payload (= if the packet is longer then what byte 0x07 implies), the device
-responds with error code 0x02. 
+responds with an error packet with error code 0x02.
 
 When the size of the payload is bigger then what the device expects (for
 example, when sending a packet with function number 0x80 and payload size 0x10),
@@ -61,18 +61,13 @@ Known function numbers:
 | 0x21 - 0x24     | response: 0x00 | Unknown. Device responds with a packet with same function number and payload of size 0x00. Perhaps some commands. |
 | 0x80            | 0x08          | "Set device time." |
 | 0x90            | ignored probably | "Send sensor data immediately". |
-| 0xee            | 0x01          | Error code. Only valid in one direction: when the weather station is the sender. |
+| 0xee            | 0x01          | Notification of an error condition. Only valid in one direction: when the weather station is the sender. |
 
 Function numbers other then 0x00, 0x01 and 0x80 were discovered by fuzzing the
 device by trying all possible function numbers with a long payload.
 
 Function number 0x01, payload size 0x39 - weather station sensor data
 ---------------------------------------------------------------------
-
-If the device time has not been set by a packet with function number 0x80, this
-packet is sent automatically by the device every 12.5s. 
-Setting the device time results in this packet being sent approximately every
-107s.
 
 The weather station sends this packet automatically only if the handling
 program (the program I am writing) sends back ping packets.
@@ -112,7 +107,7 @@ Other values possibly present in the not decoded fields in the payload:
 After powering on the device, it the date gets set to 2016-01-01.
 Sometimes the device sends incorrect times such as "2020-12-15 10:60:00" instead
 of the expected "2020-12-15 11:00:00", it is necessary to account for this.
-The time is in local timezone, exactly just as is shown on the device's screen.  
+The time is in local timezone, exactly just as is shown on the device's screen.
 
 ### Timezone
 
@@ -141,7 +136,7 @@ by the user.
 ### Sensor data format
 
 When the respective sensor is not present, all 9 bytes corresponding to this
-sensor have value 0xff. It is possible that only some bytes can have this value
+sensor have value 0xff. It may be possible that only some bytes have this value
 (for example, when humidity is known but temperature is unknown), but I have not
 seen such packets.
 
@@ -176,28 +171,29 @@ would be incorrect - likewise for maximum values.
 Function number 0x80 - set weather station clock
 ------------------------------------------------
 
-Bytes 0x00-0x06 of payload correspond to bytes 0x01-0x07 of weather station
-sensor data payload (see "Function number 0x01, payload size 0x39" and also
-discussion there). In particular, seconds (in byte 0x06) should also be
-multiplied by 2.
+To set the weather station clock, send to it a packet with function code 0x80
+and payload of 8 bytes.
 
-In traffic between the weather station and SMARTSERVER.EMAXTIME.CN, the server
-sets byte 0x07 of the payload to 0x00. Other values of this byte seem to do
-nothing interesting. The device sets byte 0x07 to 0x00 in response, so probably
-its value in incoming packets is ignored.
+Bytes 0x00-0x06 of this payload should contain current time, they
+correspond to bytes 0x01-0x07 of weather station sensor data payload (see
+"Function number 0x01, payload size 0x39" and also discussion there). In
+particular, seconds (in byte 0x06) should also be multiplied by 2.
 
-The device responds to a packet with function number 0x80 with the same packet
-back, but if byte 0x08 of the whole packet (not of the payload) was set to 0x01,
-the device responds with a packet with byte 0x08 cleared.
-The server at SMARTSERVER.EMAXTIME.CN sets the byte 0x08 to 0x01.
+Byte 0x07 of payload: the server at SMARTSERVER.EMAXTIME.CN sets this byte to
+0x00, other values of this byte seem to do nothing interesting.
+
+The device should respond with the same packet back (but clears byte 0x08 of
+whole packet (not of the payload), if it was set to 0x01).
 
 Setting the weather station clock using function 0x80 increases the period
-between consecutive sensor data reports (how often the device sends packets 
-containing sensor data) - from 12.5s to around 107s. From my perspective, this
-is unfortunate. I have tried a large number of various tricks to change this
-behavior and this was the primary motivation of my fuzzing the weather station.
-I have found no other way around this limitation other than querying the station
-manually using packets with function number 0x90, though.
+between consecutive sensor data reports (how often the device sends 0x01 packets
+containing sensor data) - from 12.5s to around 107s. Setting the time manually
+using buttons on the back of the device does not cause such side-effects.
+From my perspective, this is unfortunate. I have tried a large number of various
+tricks to change this behavior and this was the primary motivation of my fuzzing
+the weather station. I have found no other way around this limitation other
+than querying the station manually using packets with function number 0x90,
+though.
 
 Function number 0x90 - query device sensor state
 ------------------------------------------------
