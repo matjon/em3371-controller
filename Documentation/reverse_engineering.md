@@ -92,14 +92,13 @@ number 0x90 "Set device time".
 | 0x12   | 9      | Sensor data from the remote sensor on channel 1. |
 | 0x1b   | 9      | Sensor data from the remote sensor on channel 2. |
 | 0x24   | 9      | Sensor data from the remote sensor on channel 3. |
-| 0x2d   | 1      | Unknown, in received packets always 0x00. Could contain "battery low" alerts. |
+| 0x2d   | 1      | Bit field of "battery low" alerts from remote sensors. (see below) |
 | 0x2e   | 1      | Information on lost signal from sensors (see below). |
 | 0x2f   | 2      | Atmospheric pressure in hPa, little-endian. Maybe 0xff 0xff when no data. |
 | 0x31   | 1      | Unknown - has value 0x00, 0x10 or 0x20. Maybe trend of atmospheric pressure. |
 | 0x32   | 7      | Always 0xff. Perhaps corresponding to some functionality not present in the specimen, or possibly for future expansion. |
 
 Other values possibly present in the not decoded fields in the payload:
-- low battery alerts of remote sensors,
 - low battery alerts of the weather station itself.
 
 ### Device time
@@ -150,6 +149,18 @@ Minimum temperature and humidity can have been taken at
 different times, therefore calculating metrics from them (such as dew point)
 would be incorrect - likewise for maximum values.
 
+### Byte 0x2d - battery low alerts
+
+Byte 0x2d of the payload is a bit field:
+
+| Bit number | Description |
+| ---------- | --------------------------- |
+| 0          | Unknown, always 0. |
+| 1          | Battery low alert from sensor on channel 1. |
+| 2          | Battery low alert from sensor on channel 2. |
+| 3          | Battery low alert from sensor on channel 3. |
+| 4-7        | Unknown, always 0. |
+
 ### Byte 0x2e - lost sensors
 
 Byte 0x2e of the payload is a bit field:
@@ -159,7 +170,7 @@ Byte 0x2e of the payload is a bit field:
 | 0          | Lost signal from sensor on channel 1. |
 | 1          | Lost signal from sensor on channel 2. |
 | 2          | Lost signal from sensor on channel 3. |
-| 3-7        | Always 0. |
+| 3-7        | Unknown, always 0. |
 
 After powering off a remote sensor:
 
