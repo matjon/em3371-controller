@@ -87,27 +87,28 @@ number 0x90 "Set device time".
 | 0x05   | 1      | Wall clock hour |
 | 0x06   | 1      | Wall clock minutes |
 | 0x07   | 1      | Seconds multiplied by 2, with a resolution of 0,5s. |
-| 0x08   | 1      | Unknown, probably always 0x00 or 0x01. |
+| 0x08   | 1      | Unknown, probably always 0x00 or 0x01. Looks like AM / PM flag. |
 | 0x09   | 9      | Sensor data from sensors in the main weather station module (see below). |
 | 0x12   | 9      | Sensor data from the remote sensor on channel 1. |
 | 0x1b   | 9      | Sensor data from the remote sensor on channel 2. |
 | 0x24   | 9      | Sensor data from the remote sensor on channel 3. |
-| 0x2d   | 2      | Unknown, in received packets always 0x00. |
-| 0x2f   | 2      | Atmospheric pressure in hPa, little-endian. Probably 0xff 0xff when no data. |
+| 0x2d   | 1      | Unknown, in received packets always 0x00. Could contain "battery low" alerts. |
+| 0x2e   | 1      | Information on lost signal from sensors (see below). |
+| 0x2f   | 2      | Atmospheric pressure in hPa, little-endian. Maybe 0xff 0xff when no data. |
 | 0x31   | 1      | Unknown - has value 0x00, 0x10 or 0x20. Maybe trend of atmospheric pressure. |
-| 0x32   | 7      | Always 0xff. Perhaps corresponding to some functionality not present in the specimen, or possibly for future extension. |
+| 0x32   | 7      | Always 0xff. Perhaps corresponding to some functionality not present in the specimen, or possibly for future expansion. |
 
 Other values possibly present in the not decoded fields in the payload:
-- whether a remote sensor is in sync with the device,
 - low battery alerts of remote sensors,
 - low battery alerts of the weather station itself.
 
 ### Device time
 
-After powering on the device, it the date gets set to 2016-01-01.
-Sometimes the device sends incorrect times such as "2020-12-15 10:60:00" instead
-of the expected "2020-12-15 11:00:00", it is necessary to account for this.
-The time is in local timezone, exactly just as is shown on the device's screen.
+After powering on the device, the date gets set to 2016-01-01.
+Sometimes the device sends incorrect time data such as "2020-12-15 10:60:00"
+instead of the expected "2020-12-15 11:00:00", it is necessary to account for
+this. The time is in local timezone, exactly just as is shown on the device's
+screen.
 
 See discussion of timezone in description of "function number 0x80 - set weather
 station clock".
@@ -143,9 +144,42 @@ obtained this way matches exactly the one displayed on the device's screen.
 Minimum and maximum values of humidity and temperature are taken since the
 weather station was powered on. They are shown on the device's screen after
 pressing the MEM button. The values can be reset by pressing the MEM button for
-several seconds. Minimum temperature and humidity can have been taken at
+several seconds. They also are reset after the remote sensor is being paired
+again with the device.
+Minimum temperature and humidity can have been taken at
 different times, therefore calculating metrics from them (such as dew point)
 would be incorrect - likewise for maximum values.
+
+### Byte 0x2e - lost sensors
+
+Byte 0x2e of the payload is a bit field:
+
+| Bit number | Description |
+| ---------- | --------------------------- |
+| 0          | Lost signal from sensor on channel 1. |
+| 1          | Lost signal from sensor on channel 2. |
+| 2          | Lost signal from sensor on channel 3. |
+| 3-7        | Always 0. |
+
+After powering off a remote sensor:
+
+- after around 5 minutes the small "radio signal" symbol on weather station
+  display disappears. Unfortunately, it is AFAIK not possible to get this
+  information through network API. Old metrics from this sensor are displayed
+  unchanged on the display and are sent in packets.
+- 1 hour after powering off: the corresponding bit of byte 0x2e
+  gets set. The display starts alternating between "--.-" and last known metrics
+  from the respective sensor.
+- 2h after powering off: in weather station sensor data (function number 0x01)
+  packets corresponding bytes get all set to 0xff. The corresponding bit in byte
+  0x2e of payload is still set.
+
+Therefore, after receiving a packet with some bits in byte 0x2e set, the
+application may wish to flag all data from the appropriate sensor(s) from last 
+1 hour as unreliable.
+
+TODO: check if after the sensor becomes available again (before the 1 hour mark)
+the min/max metrics are reset.
 
 Function number 0x80 - set weather station clock
 ------------------------------------------------
@@ -176,7 +210,7 @@ though.
 
 ### Timezone
 
-Byte 0x00 of payload of functiono 0x80 contains the desired device timezone.
+Byte 0x00 of payload of function 0x80 contains the desired device timezone.
 
 It is possible to set the timezone manually by pressing the SET button on
 the back of the device for several seconds, then pressing it once. Then use the
