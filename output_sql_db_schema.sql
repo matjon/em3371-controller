@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS sensor_reading (
    temperature          NUMERIC(5,2),
    humidity             SMALLINT,
    dew_point            NUMERIC(5,2),
+   battery_low          BIT(1),
    PRIMARY KEY(metrics_state_id, sensor_id),
    FOREIGN KEY(metrics_state_id)
         REFERENCES metrics_state(metrics_state_id)
@@ -50,7 +51,12 @@ CREATE TABLE IF NOT EXISTS sensor_reading_debug(
         ON DELETE cascade
 );
 
+
+-- Statements to execute to upgrade database schema:
 -- ALTER TABLE sensor_reading_debug ADD COLUMN payload_0x31 SMALLINT;
+--
+-- ALTER TABLE sensor_reading ADD COLUMN battery_low BIT(1);
+--
 
 --------------------------------------------------------------------
 -- The tables below are work in progress

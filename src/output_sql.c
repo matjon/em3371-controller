@@ -73,7 +73,7 @@ void display_sensor_state_debug(FILE *stream, const int sensor_id,
 
 void display_sensor_reading_sql(FILE *stream, const int sensor_id,
                 const struct device_single_measurement *measurement,
-                uint16_t atmospheric_pressure)
+                uint16_t atmospheric_pressure, bool battery_low)
 {
         fputs("INSERT INTO sensor_reading(metrics_state_id, sensor_id", stream);
 
@@ -92,6 +92,8 @@ void display_sensor_reading_sql(FILE *stream, const int sensor_id,
                         fputs(", atmospheric_pressure", stream);
                 }
 
+                fputs(", battery_low", stream);
+
         fprintf(stream, ") VALUES (@insert_id, %d", sensor_id);
                 if (!DEVICE_IS_INCORRECT_TEMPERATURE(measurement->temperature)) {
                         fprintf(stream, ", %.2f", measurement->temperature);
@@ -108,6 +110,13 @@ void display_sensor_reading_sql(FILE *stream, const int sensor_id,
                 if (atmospheric_pressure != DEVICE_INCORRECT_PRESSURE) {
                         fprintf(stream, ", %d", (int) atmospheric_pressure);
                 }
+
+                if (battery_low) {
+                        fputs(", b\'1\'", stream);
+                } else {
+                        fputs(", b\'0\'", stream);
+                }
+
         fputs(");\n", stream);
 }
 
@@ -138,7 +147,8 @@ void display_sensor_state_sql(FILE *stream, const struct device_sensor_state *st
         if (state->station_sensor.any_data_present) {
                 display_sensor_reading_sql(stream, 0,
                                 &state->station_sensor.current,
-                                state->atmospheric_pressure);
+                                state->atmospheric_pressure,
+                                false);
                 display_sensor_state_debug(stream, 0, &state->station_sensor,
                                 state->payload_byte_0x31);
         }
@@ -146,7 +156,8 @@ void display_sensor_state_sql(FILE *stream, const struct device_sensor_state *st
                 if (state->remote_sensors[i].any_data_present) {
                         display_sensor_reading_sql(stream, i+1,
                                 &state->remote_sensors[i].current,
-                                DEVICE_INCORRECT_PRESSURE);
+                                DEVICE_INCORRECT_PRESSURE,
+                                state->remote_sensors[i].battery_low);
 
                         display_sensor_state_debug(stream, i+1, &state->remote_sensors[i], 0);
                 }
