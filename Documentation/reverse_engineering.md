@@ -92,7 +92,7 @@ number 0x90 "Set device time".
 | 0x12   | 9      | Sensor data from the remote sensor on channel 1. |
 | 0x1b   | 9      | Sensor data from the remote sensor on channel 2. |
 | 0x24   | 9      | Sensor data from the remote sensor on channel 3. |
-| 0x2d   | 1      | Bit field of "battery low" alerts from remote sensors. (see below) |
+| 0x2d   | 1      | A bit field of "battery low" alerts from remote sensors. (see below) |
 | 0x2e   | 1      | Information on lost signal from sensors (see below). |
 | 0x2f   | 2      | Atmospheric pressure in hPa, little-endian. Maybe 0xff 0xff when no data. |
 | 0x31   | 1      | Unknown - has value 0x00, 0x10 or 0x20. Maybe trend of atmospheric pressure. |
