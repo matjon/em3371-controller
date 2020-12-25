@@ -19,8 +19,8 @@ the purpose of showing compatibility or potential compatibility.
 Usage reports are very welcome - through a GitHub bug report or a mail to
 "mat.jonczyk" in the domain "o2.pl".
 
-**Warning**: the program is under active development. Interface stability is not
-guaranteed.
+**Warning**: this program is under active development. Interface stability is
+not guaranteed.
 
 Supported operating systems
 ---------------------------
@@ -158,17 +158,12 @@ I therefore used `toolchain-mipsel_gcc-linaro_uClibc-0.9.32`, which works correc
 - handle '--help' command line parameter,
 - write proper README.md,
 - reverse engineering:
-    - describe how `historical1` and `historical2` in `device_single_sensor_data` behave,
-    - decode other bytes in packets sent by the device,
-    Some versions of the weather station are advertised to contain a DCF77 time
-    signal receiver (from a transmitter near Frankfurt, Germany).
-    Time received this way would be more reliable.
+    - byte 0x31 of payload from function 0x01,
 - use a Makefile instead of compile.sh
 - Windows port
     - probably the best approach would be to use Gnulib:
             https://www.gnu.org/software/gnulib/
 - maybe some refactoring,
-- write text documentation of the protocol used by the weather station,
 - a webpage that displays the last and historical measurements.
   It could be made using a single HTML file, with some JavaScript code that
   would download the results in JSON. The C program could provide a single text file
