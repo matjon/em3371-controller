@@ -19,6 +19,9 @@ the purpose of showing compatibility or potential compatibility.
 Usage reports are very welcome - through a GitHub bug report or a mail to
 "mat.jonczyk" in the domain "o2.pl".
 
+**Warning**: the program is under active development. Interface stability is not
+guaranteed.
+
 Supported operating systems
 ---------------------------
 
@@ -29,7 +32,7 @@ This program runs on GNU/Linux and DD-WRT. It was not tested on OpenWRT, but
 modifying it to work there should be simple. It should run without problems on
 a Raspberry Pi with GNU/Linux installed.
 
-Windows is currently not supported, but I may work on it in the future.
+Windows is currently not supported, but I may work on it in the future
 (possibly using the Gnulib library).
 
 Configuring the weather station
