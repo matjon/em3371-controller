@@ -161,6 +161,8 @@ static bool decode_single_sensor_data(struct device_single_sensor_data *out,
         check_measurement_ordering(&out->current, &out->historical_max,
                         "current", "historical maximum");
 
+        out->battery_low = false;
+
 	return out->any_data_present;
 }
 
@@ -208,9 +210,16 @@ static void decode_sensor_state(struct device_sensor_state *state, const unsigne
 		return;
 	}
 
+        unsigned char battery_low_bitmask = received_packet[0x0c + 0x2d];
+
 	decode_single_sensor_data(&(state->station_sensor), received_packet + 21);
 	for (int i = 0; i < 3; i++) {
 		decode_single_sensor_data(&(state->remote_sensors[i]), received_packet + 30 + i*9);
+                if ((battery_low_bitmask >> (i+1)) & 0x1) {
+                        state->remote_sensors[i].battery_low = true;
+                } else {
+                        state->remote_sensors[i].battery_low = false;
+                }
 	}
 
 	if (received_packet[59] == 0xff && received_packet[60] == 0xff) {

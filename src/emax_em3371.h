@@ -43,6 +43,7 @@ struct device_single_measurement {
 
 struct device_single_sensor_data {
 	bool any_data_present;
+        bool battery_low;
 
 	struct device_single_measurement current;
 

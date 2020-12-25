@@ -59,6 +59,10 @@ static void display_single_sensor_json(FILE *stream, const struct device_single_
 	fprintf(stream, ",\n    \"historical_min\": ");
 	display_single_measurement_json(stream, &(state->historical_min));
 
+        if (state->battery_low) {
+                fprintf(stream, ",\n    \"battery_low\": true");
+        }
+
 	fprintf(stream, "\n  }");
 }
 
