@@ -72,9 +72,12 @@ void display_sensor_state_debug(FILE *stream, const int sensor_id,
 }
 
 void display_sensor_reading_sql(FILE *stream, const int sensor_id,
-                const struct device_single_measurement *measurement,
-                uint16_t atmospheric_pressure, bool battery_low)
+                const struct device_single_sensor_data *sensor_data,
+                uint16_t atmospheric_pressure)
 {
+
+        const struct device_single_measurement *measurement = &sensor_data->current;
+
         fputs("INSERT INTO sensor_reading(metrics_state_id, sensor_id", stream);
 
                 if (!DEVICE_IS_INCORRECT_TEMPERATURE(measurement->temperature)) {
@@ -111,7 +114,7 @@ void display_sensor_reading_sql(FILE *stream, const int sensor_id,
                         fprintf(stream, ", %d", (int) atmospheric_pressure);
                 }
 
-                if (battery_low) {
+                if (sensor_data->battery_low) {
                         fputs(", b\'1\'", stream);
                 } else {
                         fputs(", b\'0\'", stream);
@@ -146,18 +149,16 @@ void display_sensor_state_sql(FILE *stream, const struct device_sensor_state *st
         fprintf(stream, "SET @insert_id = LAST_INSERT_ID();\n");
         if (state->station_sensor.any_data_present) {
                 display_sensor_reading_sql(stream, 0,
-                                &state->station_sensor.current,
-                                state->atmospheric_pressure,
-                                false);
+                                &state->station_sensor,
+                                state->atmospheric_pressure);
                 display_sensor_state_debug(stream, 0, &state->station_sensor,
                                 state->payload_byte_0x31);
         }
         for (int i=0; i<3; i++) {
                 if (state->remote_sensors[i].any_data_present) {
                         display_sensor_reading_sql(stream, i+1,
-                                &state->remote_sensors[i].current,
-                                DEVICE_INCORRECT_PRESSURE,
-                                state->remote_sensors[i].battery_low);
+                                &state->remote_sensors[i],
+                                DEVICE_INCORRECT_PRESSURE);
 
                         display_sensor_state_debug(stream, i+1, &state->remote_sensors[i], 0);
                 }
