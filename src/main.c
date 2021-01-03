@@ -308,7 +308,7 @@ static void parse_program_options(const int argc, char **argv,
                 { "port",         required_argument, NULL, 'p' },
                 { "no-reply",     no_argument,       NULL, 'r' },
                 { "status-file",  required_argument, NULL, 's' },
-                { "csv",          required_argument, NULL, 'c' },
+                { "csv-output",   required_argument, NULL, 'c' },
                 { "inject",       no_argument,       NULL, 'i' },
                 {0, 0, 0, 0}
         };
