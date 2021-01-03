@@ -35,7 +35,7 @@ static void display_CSV_header(FILE *stream)
 
 bool init_CSV_output(const char *csv_output_path)
 {
-        bool ret = init_output_file(csv_output_path, &csv_output_stream,
+        bool ret = open_output_file(csv_output_path, &csv_output_stream,
                         &csv_output_stream_close_on_exit, "CSV");
 
         if (ret) {

@@ -244,7 +244,7 @@ int send_udp_packet(int udp_socket, const struct sockaddr_in *destination,
 }
 
 
-bool init_output_file(const char *output_path, FILE **output_stream,
+bool open_output_file(const char *output_path, FILE **output_stream,
                 bool *output_close_on_exit, const char *output_type_name)
 {
         if (strcmp(output_path, "-") == 0) {
