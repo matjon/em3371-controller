@@ -35,22 +35,13 @@ static void display_CSV_header(FILE *stream)
 
 bool init_CSV_output(const char *csv_output_path)
 {
-        if (strcmp(csv_output_path, "-") == 0) {
-                csv_output_stream = stdout;
-                csv_output_stream_close_on_exit = false;
-        } else {
-                csv_output_stream = fopen(csv_output_path, "a");
-                if (csv_output_stream == NULL) {
-                        csv_output_stream_close_on_exit = false;
-                        perror("Cannot open file for CSV output");
-                        return false;
-                }
+        bool ret = init_output_file(csv_output_path, &csv_output_stream,
+                        &csv_output_stream_close_on_exit, "CSV");
 
-                csv_output_stream_close_on_exit = true;
+        if (ret) {
+                display_CSV_header(csv_output_stream);
         }
-
-        display_CSV_header(csv_output_stream);
-        return true;
+        return ret;
 }
 
 void shutdown_CSV_output()

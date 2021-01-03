@@ -243,6 +243,33 @@ int send_udp_packet(int udp_socket, const struct sockaddr_in *destination,
 	return 0;
 }
 
+
+bool init_output_file(const char *output_path, FILE **output_stream,
+                bool *output_close_on_exit, const char *output_type_name)
+{
+        if (strcmp(output_path, "-") == 0) {
+                *output_stream = stdout;
+                *output_close_on_exit = false;
+        } else {
+                *output_stream = fopen(output_path, "a");
+                if (*output_stream == NULL) {
+                        char error_msg[1000];
+                        snprintf(error_msg, sizeof(error_msg),
+                               "Cannot open stream \'%s\' for %s output",
+                               output_path, output_type_name);
+
+                        *output_close_on_exit = false;
+                        perror(error_msg);
+                        return false;
+                } else {
+                        *output_close_on_exit = true;
+                }
+        }
+
+        return true;
+}
+
+
 static void init_logging(const struct program_options *options)
 {
         fprintf(stderr, "Warning: output formats are subject to change\n");
