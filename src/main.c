@@ -269,6 +269,12 @@ bool open_output_file(const char *output_path, FILE **output_stream,
         return true;
 }
 
+void close_output_file(FILE **output_stream, bool *output_close_on_exit) {
+        if (*output_close_on_exit && *output_stream != NULL) {
+                fclose(*output_stream);
+                *output_stream = NULL;
+        }
+}
 
 static void init_logging(const struct program_options *options)
 {

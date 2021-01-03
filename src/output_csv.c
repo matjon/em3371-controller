@@ -46,10 +46,7 @@ bool init_CSV_output(const char *csv_output_path)
 
 void shutdown_CSV_output()
 {
-        if (csv_output_stream_close_on_exit && csv_output_stream != NULL) {
-                fclose(csv_output_stream);
-                csv_output_stream = NULL;
-        }
+        close_output_file(&csv_output_stream, &csv_output_stream_close_on_exit);
 }
 
 static void display_single_measurement_CSV(FILE *stream, const struct device_single_measurement *state)
