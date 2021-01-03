@@ -79,7 +79,7 @@ static bool decode_single_measurement(struct device_single_measurement *measurem
                 // When the device is configured to display temperature in °F,
                 // the temperature calculated this way matches exactly the one
                 // displayed on the device's screen.
-                float temperature_fahrenheit = (float) raw_temperature / 10 - 90;
+                float temperature_fahrenheit = (float) raw_temperature / 10. - 90.;
 		measurement->temperature = fahrenheit_to_celcius(temperature_fahrenheit);
 	}
 
