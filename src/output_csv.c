@@ -17,8 +17,12 @@
  */
 
 #include "output_csv.h"
+#include <string.h>
 
-void display_CSV_header(FILE *stream)
+static FILE *csv_output_stream = NULL;
+static bool csv_output_stream_close_on_exit = false;
+
+static void display_CSV_header(FILE *stream)
 {
         fputs("time;atmospheric_pressure;"
                 "station_temp;station_humidity;station_dew_point;"
@@ -27,6 +31,34 @@ void display_CSV_header(FILE *stream)
                 "sensor3_temp;sensor3_humidity;sensor3_dew_point;"
                 "\n", stream);
         fflush(stream);
+}
+
+bool init_CSV_output(const char *csv_output_path)
+{
+        if (strcmp(csv_output_path, "-") == 0) {
+                csv_output_stream = stdout;
+                csv_output_stream_close_on_exit = false;
+        } else {
+                csv_output_stream = fopen(csv_output_path, "a");
+                if (csv_output_stream == NULL) {
+                        csv_output_stream_close_on_exit = false;
+                        perror("Cannot open file for CSV output");
+                        return false;
+                }
+
+                csv_output_stream_close_on_exit = true;
+        }
+
+        display_CSV_header(csv_output_stream);
+        return true;
+}
+
+void shutdown_CSV_output()
+{
+        if (csv_output_stream_close_on_exit && csv_output_stream != NULL) {
+                fclose(csv_output_stream);
+                csv_output_stream = NULL;
+        }
 }
 
 static void display_single_measurement_CSV(FILE *stream, const struct device_single_measurement *state)
@@ -50,8 +82,10 @@ static void display_single_measurement_CSV(FILE *stream, const struct device_sin
         }
 }
 
-void display_sensor_state_CSV(FILE *stream, const struct device_sensor_state *state)
+void display_sensor_state_CSV(const struct device_sensor_state *state)
 {
+        FILE *stream = csv_output_stream;
+
 	char current_time[30];
 	current_time_to_string(current_time, sizeof(current_time), true);
 

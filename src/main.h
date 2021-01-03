@@ -40,6 +40,7 @@ struct program_options {
         bool reply_to_ping_packets;
         bool allow_injecting_packets;
 
+        char *csv_output_path;
         char *status_file_path;
 };
 #define DEFAULT_BIND_PORT 17000

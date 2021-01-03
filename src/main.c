@@ -243,18 +243,30 @@ int send_udp_packet(int udp_socket, const struct sockaddr_in *destination,
 	return 0;
 }
 
-static void init_logging()
+static void init_logging(const struct program_options *options)
 {
         fprintf(stderr, "Warning: output formats are subject to change\n");
-        display_CSV_header(stdout);
+        if (options->csv_output_path) {
+                bool ret = init_CSV_output(options->csv_output_path);
+                if (ret == false) {
+                        exit(2);
+                }
+        }
+}
+
+static void shutdown_logging()
+{
+        shutdown_CSV_output();
 }
 
 void handle_decoded_sensor_state(const struct device_sensor_state *sensor_state,
                 const struct program_options *options)
 {
         display_sensor_state_json(stderr, sensor_state);
-        display_sensor_state_CSV(stdout, sensor_state);
-        // display_sensor_state_sql(stdout, sensor_state);
+        if (options->csv_output_path) {
+                display_sensor_state_CSV(sensor_state);
+        }
+        //display_sensor_state_sql(stdout, sensor_state);
         update_status_file(options->status_file_path, sensor_state);
 }
 
@@ -296,6 +308,7 @@ static void parse_program_options(const int argc, char **argv,
                 { "port",         required_argument, NULL, 'p' },
                 { "no-reply",     no_argument,       NULL, 'r' },
                 { "status-file",  required_argument, NULL, 's' },
+                { "csv",          optional_argument, NULL, 'c' },
                 { "inject",       no_argument,       NULL, 'i' },
                 {0, 0, 0, 0}
         };
@@ -306,6 +319,7 @@ static void parse_program_options(const int argc, char **argv,
 
         options->reply_to_ping_packets = true;
         options->status_file_path = NULL;
+        options->csv_output_path = NULL;
         options->allow_injecting_packets = false;
 
         // The following is vaguely based on the example code in
@@ -362,6 +376,13 @@ static void parse_program_options(const int argc, char **argv,
                         */
                         options->reply_to_ping_packets = false;
                         break;
+                case 'c':
+                        if (optarg == NULL) {
+                                options->csv_output_path = "-";
+                        } else {
+                                options->csv_output_path = optarg;
+                        }
+                        break;
 
                 case 's':
                         options->status_file_path = optarg;
@@ -371,6 +392,7 @@ static void parse_program_options(const int argc, char **argv,
                         break;
                 case '?':
                         exit(1);
+                        break;
                 default:
                         fputs("Incorrect command line parameters!\n", stderr);
                         exit(1);
@@ -419,7 +441,7 @@ int main(int argc, char **argv)
 	}
 
         init_device_logic(&options);
-        init_logging();
+        init_logging(&options);
         init_signals();
 
 	while (stop_execution == false) {
@@ -453,6 +475,7 @@ int main(int argc, char **argv)
 	free(received_packet);
 	close(udp_socket);
 
+        shutdown_logging();
 	return 0;
 }
 

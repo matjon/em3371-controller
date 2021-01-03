@@ -21,5 +21,6 @@
 #include "emax_em3371.h"
 #include <stdio.h>
 
-void display_CSV_header(FILE *stream);
-void display_sensor_state_CSV(FILE *stream, const struct device_sensor_state *state);
+bool init_CSV_output(const char *csv_output_path);
+void shutdown_CSV_output();
+void display_sensor_state_CSV(const struct device_sensor_state *state);
