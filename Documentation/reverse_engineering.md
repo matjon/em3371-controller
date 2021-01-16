@@ -95,7 +95,7 @@ number 0x90 "Set device time".
 | 0x2d   | 1      | A bit field of "battery low" alerts from remote sensors. (see below) |
 | 0x2e   | 1      | Information on lost signal from sensors (see below). |
 | 0x2f   | 2      | Atmospheric pressure in hPa, little-endian. Maybe 0xff 0xff when no data. |
-| 0x31   | 1      | Unknown - has value 0x00, 0x10 or 0x20. Maybe trend of atmospheric pressure. |
+| 0x31   | 1      | Weather forecast as shown on the device screen (see below). |
 | 0x32   | 7      | Always 0xff. Perhaps corresponding to some functionality not present in the specimen, or possibly for future expansion. |
 
 Other values possibly present in the not decoded fields in the payload:
@@ -191,6 +191,23 @@ application may wish to flag all data from the appropriate sensor(s) from last
 
 TODO: check if after the sensor becomes available again (before the 1 hour mark)
 the min/max metrics are reset.
+
+### Byte 0x31 - weather forecast
+
+The values of this byte correspond to the "FORECAST" as shown on the device
+screen.
+
+| Value   | Forecast         |
+| ------- | ---------------- |
+| 0x00    | Sunny            |
+| 0x10    | Partial clouds   |
+| 0x20    | Cloudy           |
+| 0x30    | Rain             |
+| 0x40    | Thunderstorm     |
+| unknown | Snow             |
+
+It appears that the forecast is unreliable when some of the remote sensors are
+placed inside a heated building.
 
 Function number 0x80 - set weather station clock
 ------------------------------------------------
