@@ -86,8 +86,8 @@ number 0x90 "Set device time".
 | 0x04   | 1      | Day of the month |
 | 0x05   | 1      | Wall clock hour |
 | 0x06   | 1      | Wall clock minutes |
-| 0x07   | 1      | Seconds multiplied by 2, with a resolution of 0,5s. |
-| 0x08   | 1      | Unknown, probably always 0x00 or 0x01. Looks like AM / PM flag. |
+| 0x07   | 1      | Seconds multiplied by 2, with a resolution of 0.5s. |
+| 0x08   | 1      | Unknown, probably always 0x00 or 0x01. Possibly somehow related to AM / PM flag. |
 | 0x09   | 9      | Sensor data from sensors in the main weather station module (see below). |
 | 0x12   | 9      | Sensor data from the remote sensor on channel 1. |
 | 0x1b   | 9      | Sensor data from the remote sensor on channel 2. |
@@ -106,7 +106,7 @@ Other values possibly present in the not decoded fields in the payload:
 After powering on the device, the date gets set to 2016-01-01.
 Sometimes the device sends incorrect time data such as "2020-12-15 10:60:00"
 instead of the expected "2020-12-15 11:00:00", it is necessary to account for
-this. The time is in local timezone, exactly just as is shown on the device's
+this. The time is in the local timezone, exactly just as is shown on the device
 screen.
 
 See discussion of timezone in description of "function number 0x80 - set weather
