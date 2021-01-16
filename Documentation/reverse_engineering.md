@@ -212,8 +212,8 @@ placed inside a heated building.
 Function number 0x80 - set weather station clock
 ------------------------------------------------
 
-To set the weather station clock, send to it a packet with function code 0x80
-and payload of 8 bytes.
+To set the weather station clock, send to it a packet with the function code
+0x80 and a payload of 8 bytes.
 
 Bytes 0x00-0x06 of this payload should contain local time, they
 correspond to bytes 0x01-0x07 of weather station sensor data payload (see
