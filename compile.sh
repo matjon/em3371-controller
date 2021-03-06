@@ -38,7 +38,7 @@ if [ "$1" == 'dd-wrt' ]; then
                 -DBCMWPA2 -pipe -mips32 -mtune=mips32                   \
                 -fno-caller-saves  -mno-branch-likely -msoft-float      \
                 $COMMON_PARAMETERS                                      \
-                $SOURCES -o ${OUTPUT_BASE}_mipsel -lm -l:libmariadbclient.a -L.
+                $SOURCES -o ${OUTPUT_BASE}_mipsel -lm
 
         mipsel-linux-uclibc-gcc                                         \
                 -DBCMWPA2 -pipe -mips32 -mtune=mips32                   \
