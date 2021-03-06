@@ -20,107 +20,126 @@
 #include "output_sql.h"
 #include "main.h"
 
+static FILE *sql_output_stream = NULL;
+static bool sql_output_stream_close_on_exit = false;
+
+bool init_sql_output(const char *output_path)
+{
+        return open_output_file(output_path, &sql_output_stream,
+                        &sql_output_stream_close_on_exit, "SQL");
+}
+
+void shutdown_sql_output()
+{
+        close_output_file(&sql_output_stream, &sql_output_stream_close_on_exit);
+}
+
+#define SQL_INSERT_CONDITIONAL(NAME, SOURCE, FORMAT, CONDITION)         \
+        const char *NAME##_field = "";                                  \
+        char NAME##_str[10] = "";                                       \
+        if ((CONDITION)) {                                              \
+                NAME##_field = ", " #NAME;                              \
+                snprintf(NAME##_str, sizeof(NAME##_str),                \
+                                ", " FORMAT, SOURCE);                   \
+        }
+
 void display_sensor_state_debug(FILE *stream, const int sensor_id,
                 const struct device_single_sensor_data *sensor_data,
                 const unsigned char payload_byte_0x31)
 {
-        fputs("INSERT INTO sensor_reading_debug(metrics_state_id, sensor_id", stream);
+        SQL_INSERT_CONDITIONAL(temperature_min,
+                sensor_data->historical_min.temperature,
+                "%.2f",
+                !DEVICE_IS_INCORRECT_TEMPERATURE(sensor_data->historical_min.temperature)
+                )
 
-                if (!DEVICE_IS_INCORRECT_TEMPERATURE(sensor_data->historical_min.temperature)) {
-                        fputs(", temperature_min", stream);
-                }
+        SQL_INSERT_CONDITIONAL(temperature_max,
+                sensor_data->historical_max.temperature,
+                "%.2f",
+                !DEVICE_IS_INCORRECT_TEMPERATURE(sensor_data->historical_max.temperature)
+                )
 
-                if (!DEVICE_IS_INCORRECT_TEMPERATURE(sensor_data->historical_max.temperature)) {
-                        fputs(", temperature_max", stream);
-                }
+        SQL_INSERT_CONDITIONAL(humidity_min,
+                (int) sensor_data->historical_min.humidity,
+                "%d",
+                sensor_data->historical_min.humidity != DEVICE_INCORRECT_HUMIDITY
+                )
 
-                if (sensor_data->historical_min.humidity != DEVICE_INCORRECT_HUMIDITY) {
-                        fputs(", humidity_min", stream);
-                }
+        SQL_INSERT_CONDITIONAL(humidity_max,
+                (int) sensor_data->historical_max.humidity,
+                "%d",
+                sensor_data->historical_max.humidity != DEVICE_INCORRECT_HUMIDITY
+                )
 
-                if (sensor_data->historical_max.humidity != DEVICE_INCORRECT_HUMIDITY) {
-                        fputs(", humidity_max", stream);
-                }
+        SQL_INSERT_CONDITIONAL(payload_0x31,
+                (int) payload_byte_0x31,
+                "%d",
+                sensor_id == 0
+                )
 
-                if (sensor_id == 0) {
-                        fputs(", payload_0x31", stream);
-                }
+        fprintf(stream,
+                "INSERT INTO sensor_reading_debug(metrics_state_id, sensor_id"
+                "%s%s%s%s%s"
+                ") VALUES (@insert_id, %d"
+                "%s%s%s%s%s"
+                ");\n",
+                temperature_min_field, temperature_max_field,
+                humidity_min_field, humidity_max_field,
+                payload_0x31_field,
 
-        fprintf(stream, ") VALUES (@insert_id, %d", sensor_id);
+                sensor_id,
 
-                if (!DEVICE_IS_INCORRECT_TEMPERATURE(sensor_data->historical_min.temperature)) {
-                        fprintf(stream, ", %.2f", sensor_data->historical_min.temperature);
-                }
-
-                if (!DEVICE_IS_INCORRECT_TEMPERATURE(sensor_data->historical_min.temperature)) {
-                        fprintf(stream, ", %.2f", sensor_data->historical_max.temperature);
-                }
-
-                if (sensor_data->historical_min.humidity != DEVICE_INCORRECT_HUMIDITY) {
-                        fprintf(stream, ", %d", sensor_data->historical_min.humidity);
-                }
-
-                if (sensor_data->historical_max.humidity != DEVICE_INCORRECT_HUMIDITY) {
-                        fprintf(stream, ", %d", sensor_data->historical_max.humidity);
-                }
-
-                if (sensor_id == 0) {
-                        fprintf(stream, ", %d", payload_byte_0x31);
-                }
-
-        fputs(");\n", stream);
+                temperature_min_str, temperature_max_str,
+                humidity_min_str, humidity_max_str,
+                payload_0x31_str);
 }
 
 void display_sensor_reading_sql(FILE *stream, const int sensor_id,
                 const struct device_single_sensor_data *sensor_data,
                 uint16_t atmospheric_pressure)
 {
+        SQL_INSERT_CONDITIONAL(temperature,
+                sensor_data->current.temperature,
+                "%.2f",
+                !DEVICE_IS_INCORRECT_TEMPERATURE(sensor_data->current.temperature)
+                )
 
-        const struct device_single_measurement *measurement = &sensor_data->current;
+        SQL_INSERT_CONDITIONAL(humidity,
+                sensor_data->current.humidity,
+                "%d",
+                sensor_data->current.humidity != DEVICE_INCORRECT_HUMIDITY
+                )
 
-        fputs("INSERT INTO sensor_reading(metrics_state_id, sensor_id", stream);
+        SQL_INSERT_CONDITIONAL(dew_point,
+                sensor_data->current.dew_point,
+                "%.2f",
+                !DEVICE_IS_INCORRECT_TEMPERATURE(sensor_data->current.dew_point)
+                )
 
-                if (!DEVICE_IS_INCORRECT_TEMPERATURE(measurement->temperature)) {
-                        fputs(", temperature", stream);
-                }
+        SQL_INSERT_CONDITIONAL(atmospheric_pressure,
+                atmospheric_pressure,
+                "%d",
+                atmospheric_pressure != DEVICE_INCORRECT_PRESSURE
+                )
 
-                if (measurement->humidity != DEVICE_INCORRECT_HUMIDITY) {
-                        fputs(", humidity", stream);
-                }
+        const char *battery_low_str;
+        if (sensor_data->battery_low) {
+                battery_low_str = ", b\'1\'";
+        } else {
+                battery_low_str = ", b\'0\'";
+        }
 
-                if (!DEVICE_IS_INCORRECT_TEMPERATURE(measurement->dew_point)) {
-                        fputs(", dew_point", stream);
-                }
-                if (atmospheric_pressure != DEVICE_INCORRECT_PRESSURE) {
-                        fputs(", atmospheric_pressure", stream);
-                }
+        fprintf(stream, "INSERT INTO sensor_reading(metrics_state_id, sensor_id"
+                "%s%s%s%s, battery_low"
+                ") VALUES (@insert_id, %d"
+                "%s%s%s%s%s);\n",
+                temperature_field, humidity_field,
+                dew_point_field, atmospheric_pressure_field,
 
-                fputs(", battery_low", stream);
-
-        fprintf(stream, ") VALUES (@insert_id, %d", sensor_id);
-                if (!DEVICE_IS_INCORRECT_TEMPERATURE(measurement->temperature)) {
-                        fprintf(stream, ", %.2f", measurement->temperature);
-                }
-
-                if (measurement->humidity != DEVICE_INCORRECT_HUMIDITY) {
-                        fprintf(stream, ", %d", (int) measurement->humidity);
-                }
-
-                if (!DEVICE_IS_INCORRECT_TEMPERATURE(measurement->dew_point)) {
-                        fprintf(stream, ", %.2f", measurement->dew_point);
-                }
-
-                if (atmospheric_pressure != DEVICE_INCORRECT_PRESSURE) {
-                        fprintf(stream, ", %d", (int) atmospheric_pressure);
-                }
-
-                if (sensor_data->battery_low) {
-                        fputs(", b\'1\'", stream);
-                } else {
-                        fputs(", b\'0\'", stream);
-                }
-
-        fputs(");\n", stream);
+                sensor_id,
+                temperature_str, humidity_str,
+                dew_point_str, atmospheric_pressure_str,
+                battery_low_str);
 }
 
 void display_sensor_state_sql(FILE *stream, const struct device_sensor_state *state)
