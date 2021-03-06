@@ -24,6 +24,10 @@
 #include "output_csv.h"
 #include "output_sql.h"
 
+#ifdef HAVE_MYSQL
+# include "output_mysql.h"
+#endif
+
 #include <ctype.h>
 #include <errno.h>
 #include <signal.h>
@@ -285,6 +289,10 @@ static void init_logging(const struct program_options *options)
                         exit(2);
                 }
         }
+
+#ifdef HAVE_MYSQL
+        init_mysql_output();
+#endif
 }
 
 static void shutdown_logging()

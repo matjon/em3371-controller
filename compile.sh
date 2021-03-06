@@ -1,4 +1,4 @@
-# Copyright (C) 2020 Mateusz Jończyk
+# Copyright (C) 2020-2021 Mateusz Jończyk
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,11 @@ OUTPUT_BASE=emax_em3371_decoder
 COMMON_PARAMETERS="-O2 -std=c99 -Wall -Wextra"
 #COMMON_PARAMETERS="-O0 -g -std=c99 -Wall -Wextra"
 
-gcc $COMMON_PARAMETERS $SOURCES -o ${OUTPUT_BASE} -lm
+if [ "$1" == 'mariadb' ]; then
+        SOURCES="$SOURCES src/output_mysql.c"
+        MARIADB_PARAMS="-DHAVE_MYSQL $(mariadb_config  --include --libs)"
+fi
+gcc $COMMON_PARAMETERS $SOURCES -o ${OUTPUT_BASE} -lm $MARIADB_PARAMS
 
 gcc $COMMON_PARAMETERS src/psychrometrics.c src/psychrometrics_test.c -o psychrometrics_test -lm
 
