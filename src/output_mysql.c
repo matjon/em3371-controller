@@ -25,9 +25,13 @@
 
 static MYSQL * mysql_ptr;
 
-bool init_mysql_output()
+bool init_mysql_output(struct program_options *options)
 {
         mysql_ptr = mysql_init(NULL);
+        if (mysql_ptr == NULL) {
+                fputs("Cannot create MySQL object\n", stderr);
+                return false;
+        }
 
         // mysql_optionsv() should be called before every mysql_real_connect()
         unsigned int timeout=5;
@@ -37,9 +41,9 @@ bool init_mysql_output()
 
         mysql_optionsv(mysql_ptr, MYSQL_READ_DEFAULT_FILE, NULL);
 
-        if (mysql_real_connect(mysql_ptr, "localhost",
-                        "weather_station_writer", "SECRET",
-                        "weather_station",
+        if (mysql_real_connect(mysql_ptr, options->mysql_server,
+                        options->mysql_user, options->mysql_password,
+                        options->mysql_database,
                         0,
                         NULL, 0) == NULL) {
                 fprintf(stderr, "Cannot connect to MySQL server: %s\n",

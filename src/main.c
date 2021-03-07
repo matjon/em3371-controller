@@ -298,7 +298,12 @@ static void init_logging(const struct program_options *options)
         }
 
 #ifdef HAVE_MYSQL
-        init_mysql_output();
+        if (options->mysql_server != NULL) {
+                bool ret = init_mysql_output(options);
+                if (ret == false) {
+                        exit(2);
+                }
+        }
 #endif
 }
 
@@ -361,6 +366,10 @@ static void parse_program_options(const int argc, char **argv,
                 { "status-file",  required_argument, NULL, 's' },
                 { "csv-output",   required_argument, NULL, 'c' },
                 { "raw-sql-output",required_argument, NULL, 'b' },
+                { "mysql-server", required_argument, NULL, 'x' },
+                { "mysql-user",   required_argument, NULL, 'y' },
+                { "mysql-password", required_argument, NULL, 'z' },
+                { "mysql-database", required_argument, NULL, 'v' },
                 { "inject",       no_argument,       NULL, 'i' },
                 {0, 0, 0, 0}
         };
@@ -374,6 +383,13 @@ static void parse_program_options(const int argc, char **argv,
         options->csv_output_path = NULL;
         options->raw_sql_output_path = NULL;
         options->allow_injecting_packets = false;
+
+#ifdef HAVE_MYSQL
+        options->mysql_server = NULL;
+        options->mysql_user = NULL;
+        options->mysql_password = NULL;
+        options->mysql_database = NULL;
+#endif
 
         // The following is vaguely based on the example code in
         // https://www.gnu.org/software/libc/manual/html_node/Getopt-Long-Option-Example.html
@@ -443,6 +459,29 @@ static void parse_program_options(const int argc, char **argv,
                 case 's':
                         options->status_file_path = optarg;
                         break;
+
+#ifdef HAVE_MYSQL
+                case 'x':
+                        options->mysql_server = optarg;
+                        break;
+                case 'y':
+                        options->mysql_user = optarg;
+                        break;
+                case 'z':
+                        options->mysql_password = optarg;
+                        break;
+                case 'v':
+                        options->mysql_database = optarg;
+                        break;
+#else
+                case 'x':
+                case 'y':
+                case 'z':
+                case 'v':
+                        fputs("MySQL / MariaDB support not compiled in!\n", stderr);
+                        exit(1);
+                        break;
+#endif
                 case 'i':
                         options->allow_injecting_packets = true;
                         break;

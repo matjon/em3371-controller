@@ -43,6 +43,13 @@ struct program_options {
         char *csv_output_path;
         char *raw_sql_output_path;
         char *status_file_path;
+
+#ifdef HAVE_MYSQL
+        char *mysql_server;
+        char *mysql_user;
+        char *mysql_password;
+        char *mysql_database;
+#endif
 };
 #define DEFAULT_BIND_PORT 17000
 

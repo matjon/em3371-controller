@@ -19,5 +19,6 @@
 #pragma once
 
 #include <stdbool.h>
+#include "main.h"
 
 bool init_mysql_output();
