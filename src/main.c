@@ -498,6 +498,30 @@ static void parse_program_options(const int argc, char **argv,
                 fputs("Incorrect command line parameters!\n", stderr);
                 exit(1);
         }
+
+#ifdef HAVE_MYSQL
+        if (options->mysql_server != NULL
+                || options->mysql_user != NULL
+                || options->mysql_password != NULL
+                || options->mysql_database != NULL) {
+
+                if (options->mysql_server == NULL) {
+                        options->mysql_server = "localhost";
+                }
+
+                if (options->mysql_user == NULL) {
+                        fputs("Incorrect command line parameters: "
+                                "No MySQL / MariaDB user name provided!\n", stderr);
+                        exit(1);
+                }
+
+                if (options->mysql_database == NULL) {
+                        fputs("Incorrect command line parameters: "
+                                "No MySQL / MariaDB database name provided!\n", stderr);
+                        exit(1);
+                }
+        }
+#endif
 }
 
 int main(int argc, char **argv)
