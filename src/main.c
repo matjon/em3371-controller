@@ -22,7 +22,7 @@
 #include "emax_em3371.h"
 #include "output_json.h"
 #include "output_csv.h"
-#include "output_sql.h"
+#include "output_raw_sql.h"
 
 #ifdef HAVE_MYSQL
 # include "output_mysql.h"

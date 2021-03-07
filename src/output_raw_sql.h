@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2020 Mateusz Jończyk
+ *  Copyright (C) 2020-2021 Mateusz Jończyk
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,24 +16,10 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#pragma once
 
 #include "emax_em3371.h"
 
-struct sql_statements_list {
-        unsigned int count;
-        char **statements;
-
-// private
-        unsigned int max_count;
-        char *memory;
-        char *next_statement_place;
-        size_t memory_left;
-};
-#define SQL_STATEMENTS_MAX_COUNT 20
-#define SQL_STATEMENTS_MEMORY_SIZE 8*1024
-
-bool sql_statements_list_construct(struct sql_statements_list *statements);
-void sql_statements_list_free(struct sql_statements_list *statements);
-
-void get_sensor_state_sql(struct sql_statements_list *statements,
-                const struct device_sensor_state *state);
+bool init_sql_output(const char *output_path);
+void shutdown_sql_output();
+void display_sensor_state_sql(const struct device_sensor_state *state);

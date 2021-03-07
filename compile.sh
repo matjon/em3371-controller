@@ -15,7 +15,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-SOURCES="src/main.c src/emax_em3371.c src/psychrometrics.c src/output_json.c src/output_csv.c src/output_sql.c"
+SOURCES="src/main.c src/emax_em3371.c src/psychrometrics.c src/output_json.c src/output_csv.c src/output_sql.c src/output_raw_sql.c"
 OUTPUT_BASE=emax_em3371_decoder
 COMMON_PARAMETERS="-O2 -std=c99 -Wall -Wextra"
 #COMMON_PARAMETERS="-O0 -g -std=c99 -Wall -Wextra"
