@@ -284,9 +284,10 @@ void get_sensor_state_sql(
         }
 }
 
-void display_sensor_state_sql(FILE *stream, const struct device_sensor_state *state)
+void display_sensor_state_sql(const struct device_sensor_state *state)
 {
         struct sql_statements_list statements;
+        FILE *stream = sql_output_stream;
 
         fprintf(stream, "START TRANSACTION;\n");
 

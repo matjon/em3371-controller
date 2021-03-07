@@ -290,6 +290,13 @@ static void init_logging(const struct program_options *options)
                 }
         }
 
+        if (options->raw_sql_output_path) {
+                bool ret = init_sql_output(options->raw_sql_output_path);
+                if (ret == false) {
+                        exit(2);
+                }
+        }
+
 #ifdef HAVE_MYSQL
         init_mysql_output();
 #endif
@@ -297,6 +304,7 @@ static void init_logging(const struct program_options *options)
 
 static void shutdown_logging()
 {
+        shutdown_sql_output();
         shutdown_CSV_output();
 }
 
@@ -307,7 +315,9 @@ void handle_decoded_sensor_state(const struct device_sensor_state *sensor_state,
         if (options->csv_output_path) {
                 display_sensor_state_CSV(sensor_state);
         }
-        //display_sensor_state_sql(stdout, sensor_state);
+        if (options->raw_sql_output_path) {
+                display_sensor_state_sql(sensor_state);
+        }
         update_status_file(options->status_file_path, sensor_state);
 }
 
@@ -350,6 +360,7 @@ static void parse_program_options(const int argc, char **argv,
                 { "no-reply",     no_argument,       NULL, 'r' },
                 { "status-file",  required_argument, NULL, 's' },
                 { "csv-output",   required_argument, NULL, 'c' },
+                { "raw-sql-output",required_argument, NULL, 'b' },
                 { "inject",       no_argument,       NULL, 'i' },
                 {0, 0, 0, 0}
         };
@@ -361,6 +372,7 @@ static void parse_program_options(const int argc, char **argv,
         options->reply_to_ping_packets = true;
         options->status_file_path = NULL;
         options->csv_output_path = NULL;
+        options->raw_sql_output_path = NULL;
         options->allow_injecting_packets = false;
 
         // The following is vaguely based on the example code in
@@ -423,6 +435,9 @@ static void parse_program_options(const int argc, char **argv,
                         } else {
                                 options->csv_output_path = optarg;
                         }
+                        break;
+                case 'b':
+                        options->raw_sql_output_path = optarg;
                         break;
 
                 case 's':

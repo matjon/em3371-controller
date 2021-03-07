@@ -41,6 +41,7 @@ struct program_options {
         bool allow_injecting_packets;
 
         char *csv_output_path;
+        char *raw_sql_output_path;
         char *status_file_path;
 };
 #define DEFAULT_BIND_PORT 17000

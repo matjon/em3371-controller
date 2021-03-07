@@ -36,8 +36,10 @@ struct sql_statements_list {
 bool sql_statements_list_construct(struct sql_statements_list *statements);
 void sql_statements_list_free(struct sql_statements_list *statements);
 
-/*
-void sql_statements_list_get(struct sql_statements_list *statements,
+void get_sensor_state_sql(struct sql_statements_list *statements,
                 const struct device_sensor_state *state);
-*/
-void display_sensor_state_sql(FILE *stream, const struct device_sensor_state *state);
+
+
+bool init_sql_output(const char *output_path);
+void shutdown_sql_output();
+void display_sensor_state_sql(const struct device_sensor_state *state);
