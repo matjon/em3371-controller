@@ -209,11 +209,13 @@ void get_sensor_state_sql(
                 struct sql_statements_list *statements,
                 const struct device_sensor_state *state)
 {
-	char current_time[30];
-	current_time_to_string(current_time, sizeof(current_time), false);
+	char packet_arrival_time_str[30];
+	time_to_string(state->packet_arrival_time, packet_arrival_time_str,
+                        sizeof(packet_arrival_time_str), false);
 
 	char device_time_str[30];
-	time_to_string(state->device_time, device_time_str, sizeof(device_time_str));
+	time_to_string(state->device_time,
+                        device_time_str, sizeof(device_time_str), false);
 
 // TODO: Grafana really requires time stored in the database to be in UTC timezone:
 //
@@ -229,7 +231,7 @@ void get_sensor_state_sql(
                 statements->memory_left,
                 "INSERT INTO metrics_state(time_utc, device_time) "
                 "VALUES ('%s', '%s')",
-                current_time, device_time_str);
+                packet_arrival_time_str, device_time_str);
         sql_statements_list_arrange_next(statements);
 
         snprintf(statements->next_statement_place,

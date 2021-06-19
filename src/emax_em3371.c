@@ -466,11 +466,13 @@ void fuzz_station(int udp_socket, const struct sockaddr_in *packet_source,
 }
 
 
+//static int has_timesync_packet_been_sent = 0;
 static int has_timesync_packet_been_sent = 0;
 
 // Main program logic
 void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_source,
 		const unsigned char *received_packet, const size_t received_packet_size,
+                const time_t packet_arrival_time,
                 const struct program_options *options)
 {
 	dump_packet(stderr, packet_source, received_packet, received_packet_size, true);
@@ -497,6 +499,7 @@ void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_so
                         return;
                 }
 
+                sensor_state->packet_arrival_time = packet_arrival_time;
 		decode_sensor_state(sensor_state, received_packet, received_packet_size);
                 handle_decoded_sensor_state(sensor_state, options);
 		free(sensor_state);

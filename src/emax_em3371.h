@@ -66,14 +66,16 @@ struct device_sensor_state {
         // Testing: byte 0x31 of payload may contain atmospheric pressure trend.
         unsigned char payload_byte_0x31;
 
-        time_t device_time;
         // TODO: device_timezone
+        time_t device_time;
+        time_t packet_arrival_time;
 };
 #define DEVICE_INCORRECT_PRESSURE UINT16_MAX
 
 void init_device_logic(struct program_options *options);
 void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_source,
 		const unsigned char *received_packet, const size_t received_packet_size,
+                const time_t packet_arrival_time,
                 const struct program_options *options);
 
 void fuzz_station(int udp_socket, const struct sockaddr_in *packet_source,

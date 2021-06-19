@@ -74,10 +74,12 @@ void display_sensor_state_CSV(const struct device_sensor_state *state)
 {
         FILE *stream = csv_output_stream;
 
-	char current_time[30];
-	current_time_to_string(current_time, sizeof(current_time), true);
+	char packet_arrival_time_str[30];
+	time_to_string(state->packet_arrival_time,
+                packet_arrival_time_str, sizeof(packet_arrival_time_str),
+                true);
 
-        fprintf(stream, "%s;%d;", current_time, state->atmospheric_pressure);
+        fprintf(stream, "%s;%d;", packet_arrival_time_str, state->atmospheric_pressure);
         display_single_measurement_CSV(stream, &(state->station_sensor.current));
 
         for (int i=0; i < 3; i++) {

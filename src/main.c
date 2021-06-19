@@ -152,10 +152,16 @@ static void initialize_timezone()
 }
 
 void time_to_string(const time_t time_in, char *time_out,
-                const size_t buffer_size)
+                const size_t buffer_size,
+                bool use_localtime)
 {
         struct tm time_tm;
-        localtime_r(&time_in, &time_tm);
+
+        if (use_localtime) {
+                localtime_r(&time_in, &time_tm);
+        } else {
+                gmtime_r(&time_in, &time_tm);
+        }
 	// Time should be in a format that LibreOffice is able to understand
 	strftime(time_out, buffer_size, "%Y-%m-%d %H:%M:%S", &time_tm);
 }
@@ -598,7 +604,9 @@ int main(int argc, char **argv)
                         }
 			// We continue anyway
 		} else {
-			process_incoming_packet(udp_socket, &src_addr, received_packet, ret,
+			process_incoming_packet(udp_socket, &src_addr,
+                                        received_packet, ret,
+                                        time(NULL),
                                         &options);
 		}
 	}
