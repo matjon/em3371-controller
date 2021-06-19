@@ -43,7 +43,7 @@ bool shutdown_mysql_output()
         return true;
 }
 
-static bool mysql_try_connect()
+static bool try_mysql_connect()
 {
         shutdown_mysql_output();
 
@@ -118,7 +118,7 @@ bool store_sensor_state_mysql(const struct device_sensor_state *state)
         sql_statements_list_construct(&statements);
         get_sensor_state_sql(&statements, state);
 
-        if (!mysql_connected && !mysql_try_connect()) {
+        if (!mysql_connected && !try_mysql_connect()) {
                 // TODO: store the data in a temporary buffer
                 goto out;
         }
@@ -126,7 +126,7 @@ bool store_sensor_state_mysql(const struct device_sensor_state *state)
         if (! output_mysql_execute_statement("START TRANSACTION")) {
                 // If we are not able to start a transaction, something is
                 // not right. Perhaps the connection was lost. Try to reconnect.
-                if (!mysql_try_connect() ||
+                if (!try_mysql_connect() ||
                         ! output_mysql_execute_statement("START TRANSACTION")) {
                         goto out;
                 }
