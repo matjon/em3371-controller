@@ -17,6 +17,7 @@
  */
 
 #include "output_mysql.h"
+#include "output_mysql_buffer.h"
 #include "output_sql.h"
 #include <stddef.h>
 #include <stdio.h>
@@ -33,7 +34,7 @@ static const char *mysql_database;
 static bool mysql_connected=false;
 
 
-bool shutdown_mysql_output()
+static bool mysql_disconnect()
 {
         if (mysql_ptr != NULL) {
                 mysql_close(mysql_ptr);
@@ -43,9 +44,15 @@ bool shutdown_mysql_output()
         return true;
 }
 
+void shutdown_mysql_output()
+{
+        mysql_disconnect();
+        shutdown_mysql_buffer();
+}
+
 static bool try_mysql_connect()
 {
-        shutdown_mysql_output();
+        mysql_disconnect();
 
         mysql_ptr = mysql_init(NULL);
         if (mysql_ptr == NULL) {
@@ -84,13 +91,15 @@ bool init_mysql_output(struct program_options *options)
         mysql_password = options->mysql_password;
         mysql_database = options->mysql_database;
 
+        init_mysql_buffer(options->mysql_buffer_size);
+
         mysql_ptr = NULL;
         mysql_connected=false;
 
         return true;
 }
 
-bool output_mysql_execute_statement(const char *statement)
+static bool output_mysql_execute_statement(const char *statement)
 {
         int ret = mysql_query(mysql_ptr, statement);
         const char *error_string = mysql_error(mysql_ptr);
@@ -110,7 +119,7 @@ bool output_mysql_execute_statement(const char *statement)
         return true;
 }
 
-bool store_sensor_state_mysql(const struct device_sensor_state *state)
+static bool store_sensor_state_mysql_real(const struct device_sensor_state *state)
 {
         bool return_value = false;
 
@@ -145,4 +154,27 @@ bool store_sensor_state_mysql(const struct device_sensor_state *state)
 out:
         sql_statements_list_free(&statements);
         return return_value;
+}
+
+bool store_sensor_state_mysql(const struct device_sensor_state *state)
+{
+        if (! store_sensor_state_mysql_real(state)) {
+                store_in_mysql_buffer(state);
+                return false;
+        }
+
+        while (get_mysql_buffer_count() > 0) {
+                struct device_sensor_state state;
+
+                if (!pop_from_mysql_buffer(&state)) {
+                        break;
+                }
+
+                // TODO: separate pop into peek and discard
+                if (! store_sensor_state_mysql_real(&state)) {
+                        store_in_mysql_buffer(&state);
+                        return false;
+                }
+        }
+        return true;
 }

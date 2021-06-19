@@ -21,7 +21,7 @@ COMMON_PARAMETERS="-O2 -std=c99 -Wall -Wextra"
 #COMMON_PARAMETERS="-O0 -g -std=c99 -Wall -Wextra"
 
 if [ "$1" == 'mariadb' ]; then
-        SOURCES="$SOURCES src/output_mysql.c"
+        SOURCES="$SOURCES src/output_mysql.c src/output_mysql_buffer.c"
         MARIADB_PARAMS="-DHAVE_MYSQL $(mariadb_config  --include --libs)"
 fi
 gcc $COMMON_PARAMETERS $SOURCES -o ${OUTPUT_BASE} -lm $MARIADB_PARAMS

@@ -25,9 +25,6 @@ not guaranteed.
 Supported operating systems
 ---------------------------
 
-This program was written in a way that enabled it to be used on constrained
-resource devices, such as home routers.
-
 This program runs on GNU/Linux and DD-WRT. It was not tested on OpenWRT, but
 modifying it to work there should be simple. It should run without problems on
 a Raspberry Pi with GNU/Linux installed.

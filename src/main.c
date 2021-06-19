@@ -390,6 +390,7 @@ static void parse_program_options(const int argc, char **argv,
                 { "mysql-user",   required_argument, NULL, 'y' },
                 { "mysql-password", required_argument, NULL, 'z' },
                 { "mysql-database", required_argument, NULL, 'v' },
+                { "mysql-buffer-size", required_argument, NULL, 'u' },
                 { "inject",       no_argument,       NULL, 'i' },
                 {0, 0, 0, 0}
         };
@@ -409,6 +410,7 @@ static void parse_program_options(const int argc, char **argv,
         options->mysql_user = NULL;
         options->mysql_password = NULL;
         options->mysql_database = NULL;
+        options->mysql_buffer_size = 0;
 #endif
 
         // The following is vaguely based on the example code in
@@ -417,6 +419,7 @@ static void parse_program_options(const int argc, char **argv,
                 int option_index = 0;
                 char *endptr = NULL;
                 long port_number = 0;
+                long buffer_size = 0;
 
                 ret = getopt_long (argc, argv, "a:p:rs:", long_options, &option_index);
                 if (ret == -1) {
@@ -493,11 +496,30 @@ static void parse_program_options(const int argc, char **argv,
                 case 'v':
                         options->mysql_database = optarg;
                         break;
+                case 'u':
+                        endptr = NULL;
+                        buffer_size = strtol(optarg, &endptr, 10);
+                        if (*endptr != 0) {
+                                fputs("Incorrect MySQL buffer size specified on command line!\n",
+                                                stderr);
+                                exit(1);
+                        }
+
+                        if (buffer_size < 0) {
+                                fputs("MySQL buffer size must be positive!\n",
+                                                stderr);
+                                exit(1);
+                        }
+
+                        options->mysql_buffer_size = buffer_size * 1024;
+
+                        break;
 #else
                 case 'x':
                 case 'y':
                 case 'z':
                 case 'v':
+                case 'u':
                         fputs("MySQL / MariaDB support not compiled in!\n", stderr);
                         exit(1);
                         break;
@@ -523,7 +545,8 @@ static void parse_program_options(const int argc, char **argv,
         if (options->mysql_server != NULL
                 || options->mysql_user != NULL
                 || options->mysql_password != NULL
-                || options->mysql_database != NULL) {
+                || options->mysql_database != NULL
+                || options->mysql_buffer_size != 0) {
 
                 if (options->mysql_server == NULL) {
                         options->mysql_server = "localhost";

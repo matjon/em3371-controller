@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2020 Mateusz Jończyk
+ *  Copyright (C) 2020-2021 Mateusz Jończyk
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,8 +19,12 @@
 #pragma once
 
 #include <stdbool.h>
-#include "main.h"
 
-bool init_mysql_output();
-void shutdown_mysql_output();
-bool store_sensor_state_mysql(const struct device_sensor_state *state);
+#include "emax_em3371.h"
+
+bool init_mysql_buffer(size_t buffer_size);
+void shutdown_mysql_buffer();
+
+bool store_in_mysql_buffer(const struct device_sensor_state *state);
+bool pop_from_mysql_buffer(struct device_sensor_state *state);
+long get_mysql_buffer_count();

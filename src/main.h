@@ -49,6 +49,8 @@ struct program_options {
         char *mysql_user;
         char *mysql_password;
         char *mysql_database;
+
+        size_t mysql_buffer_size;
 #endif
 };
 #define DEFAULT_BIND_PORT 17000
