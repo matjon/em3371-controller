@@ -32,8 +32,11 @@ static void assert_internal_state()
 {
         assert(push_position >=0);
         assert(pop_position >=0);
-        assert(push_position < mysql_buffer_max_entries);
-        assert(pop_position < mysql_buffer_max_entries);
+
+        if (mysql_buffer_max_entries != 0) {
+                assert(push_position < mysql_buffer_max_entries);
+                assert(pop_position < mysql_buffer_max_entries);
+        }
 
         if (entries_in_buffer == mysql_buffer_max_entries) {
                 assert(push_position == pop_position);
