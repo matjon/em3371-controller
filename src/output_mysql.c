@@ -149,7 +149,9 @@ static bool store_sensor_state_mysql_real(const struct device_sensor_state *stat
                 }
         }
 
-        return_value = mysql_commit(mysql_ptr);
+        if (mysql_commit(mysql_ptr) == 0) {
+                return_value = true;
+        }
 
 out:
         sql_statements_list_free(&statements);
