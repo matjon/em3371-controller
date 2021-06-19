@@ -89,8 +89,8 @@ bool output_mysql_execute_statement(const char *statement)
         const char *error_string = mysql_error(mysql_ptr);
         if (ret != 0 || strlen(error_string) != 0) {
                 fprintf(stderr,
-                        "mysql_query failed with return value %d and message \"%s\"\n",
-                        ret, error_string);
+                        "mysql_query \"%s\" failed with return value %d and message \"%s\"\n",
+                        statement, ret, error_string);
 
                 return false;
         }
@@ -105,24 +105,39 @@ bool output_mysql_execute_statement(const char *statement)
 
 bool store_sensor_state_mysql(const struct device_sensor_state *state)
 {
+        bool return_value = false;
+
         struct sql_statements_list statements;
         sql_statements_list_construct(&statements);
         get_sensor_state_sql(&statements, state);
 
         if (!mysql_connected && !mysql_try_connect()) {
-                // TODO: store the data in temporary buffer
-                return false;
+                // TODO: store the data in a temporary buffer
+                goto out;
         }
 
-        // TOOD: error handling
-        output_mysql_execute_statement("START TRANSACTION");
+        if (! output_mysql_execute_statement("START TRANSACTION")) {
+                // If we are not able to start a transaction, something is
+                // not right. Try to reconnect.
+                if (!mysql_try_connect() ||
+                        ! output_mysql_execute_statement("START TRANSACTION")) {
+                        goto out;
+                }
+        };
+
         for (unsigned i = 0; i < statements.count; i++) {
-                output_mysql_execute_statement(statements.statements[i]);
-        }
-        mysql_commit(mysql_ptr);
+                if (!output_mysql_execute_statement(statements.statements[i])) {
+                        mysql_rollback(mysql_ptr);
 
+                        goto out;
+                }
+        }
+
+        return_value = mysql_commit(mysql_ptr);
+
+out:
         sql_statements_list_free(&statements);
-        return true;
+        return return_value;
 }
 
 
