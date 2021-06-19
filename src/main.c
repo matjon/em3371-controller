@@ -413,6 +413,7 @@ static void parse_program_options(const int argc, char **argv,
                 { "mysql-password", required_argument, NULL, 'z' },
                 { "mysql-database", required_argument, NULL, 'v' },
                 { "mysql-buffer-size", required_argument, NULL, 'u' },
+                { "set-time",     no_argument,       NULL, 't' },
                 { "inject",       no_argument,       NULL, 'i' },
                 { "help",         no_argument,       NULL, 'h' },
                 {0, 0, 0, 0}
@@ -427,6 +428,7 @@ static void parse_program_options(const int argc, char **argv,
         options->csv_output_path = NULL;
         options->raw_sql_output_path = NULL;
         options->allow_injecting_packets = false;
+        options->set_weather_station_time = false;
 
 #ifdef HAVE_MYSQL
         options->mysql_server = NULL;
@@ -443,7 +445,7 @@ static void parse_program_options(const int argc, char **argv,
                 char *endptr = NULL;
                 long port_number = 0;
 
-                ret = getopt_long (argc, argv, "a:p:s:h", long_options, &option_index);
+                ret = getopt_long (argc, argv, "a:p:s:ht", long_options, &option_index);
                 if (ret == -1) {
                         break;
                 }
@@ -503,6 +505,10 @@ static void parse_program_options(const int argc, char **argv,
 
                 case 's':
                         options->status_file_path = optarg;
+                        break;
+
+                case 't':
+                        options->set_weather_station_time = true;
                         break;
 
 #ifdef HAVE_MYSQL
@@ -592,6 +598,12 @@ static void parse_program_options(const int argc, char **argv,
                 }
         }
 #endif
+
+        if (options->set_weather_station_time && !options->reply_to_ping_packets) {
+                fputs("--set-time and --no-reply command line options cannot "
+                      "be used together\n", stderr);
+                exit(1);
+        }
 }
 
 int main(int argc, char **argv)

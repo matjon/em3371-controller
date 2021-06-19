@@ -39,6 +39,7 @@ struct program_options {
 
         bool reply_to_ping_packets;
         bool allow_injecting_packets;
+        bool set_weather_station_time;
 
         char *csv_output_path;
         char *raw_sql_output_path;

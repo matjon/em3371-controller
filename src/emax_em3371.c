@@ -467,7 +467,6 @@ void fuzz_station(int udp_socket, const struct sockaddr_in *packet_source,
 }
 
 
-//static int has_timesync_packet_been_sent = 0;
 static int has_timesync_packet_been_sent = 0;
 
 // Main program logic
@@ -512,7 +511,7 @@ void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_so
                         //fuzz_station(udp_socket, packet_source);
                 }
 
-                        if (!has_timesync_packet_been_sent) {
+                        if (!has_timesync_packet_been_sent && options->set_weather_station_time) {
                                 fputs("Injecting timesync data into the device\n", stderr);
                                 send_timesync_packet(udp_socket, packet_source,
                                                 received_packet, received_packet_size);
