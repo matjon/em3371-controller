@@ -281,7 +281,7 @@ void init_device_logic(struct program_options *options)
         }
 }
 
-static void send_timesync_packet(int udp_socket, const struct sockaddr_in *packet_source,
+static bool send_timesync_packet(int udp_socket, const struct sockaddr_in *packet_source,
 		const unsigned char *received_packet, const size_t received_packet_size)
 {
         if (received_packet_size <= 8) {
@@ -315,6 +315,11 @@ static void send_timesync_packet(int udp_socket, const struct sockaddr_in *packe
         time_t current_time = time(NULL);
         struct tm current_time_tm;
         localtime_r(&current_time, &current_time_tm);
+
+        if (current_time_tm.tm_year < 2000) {
+                // Device date appears not to be set.
+                return false;
+        }
 
         // tm_gmtoff is a GNU extension, but also available in uclibc
         int current_timezone = current_time_tm.tm_gmtoff / 3600;
@@ -351,6 +356,8 @@ static void send_timesync_packet(int udp_socket, const struct sockaddr_in *packe
 
 	dump_packet(stderr, packet_source, buffer, sizeof(buffer), false);
         send_udp_packet(udp_socket, packet_source, buffer, sizeof(buffer));
+
+        return true;
 }
 
 unsigned char decode_hex_digit(char digit)
@@ -513,9 +520,10 @@ void process_incoming_packet(int udp_socket, const struct sockaddr_in *packet_so
 
                         if (!has_timesync_packet_been_sent && options->set_weather_station_time) {
                                 fputs("Injecting timesync data into the device\n", stderr);
-                                send_timesync_packet(udp_socket, packet_source,
-                                                received_packet, received_packet_size);
-                                has_timesync_packet_been_sent = 1;
+                                if (send_timesync_packet(udp_socket, packet_source,
+                                                received_packet, received_packet_size)) {
+                                        has_timesync_packet_been_sent = 1;
+                                }
                         }
 	}
 }
