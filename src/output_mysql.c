@@ -54,7 +54,7 @@ static bool mysql_try_connect()
         }
 
         // mysql_optionsv() should be called before every mysql_real_connect()
-        unsigned int timeout=5;
+        unsigned int timeout=2;
         mysql_optionsv(mysql_ptr, MYSQL_OPT_CONNECT_TIMEOUT, (void *)&timeout);
         mysql_optionsv(mysql_ptr, MYSQL_OPT_READ_TIMEOUT, (void *)&timeout);
         mysql_optionsv(mysql_ptr, MYSQL_OPT_WRITE_TIMEOUT, (void *)&timeout);
@@ -146,6 +146,3 @@ out:
         sql_statements_list_free(&statements);
         return return_value;
 }
-
-
-// TODO: shutdown
