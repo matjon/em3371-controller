@@ -1,4 +1,6 @@
 .*.swp
+*.o
+*.d
 *~
 emax_em3371_decoder
 emax_em3371_decoder_mipsel
