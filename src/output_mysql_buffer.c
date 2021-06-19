@@ -94,8 +94,8 @@ bool store_in_mysql_buffer(const struct device_sensor_state *state)
         }
 
         if (entries_in_buffer >= mysql_buffer_max_entries) {
-                entries_in_buffer--;
-                pop_position = (pop_position + 1) % mysql_buffer_max_entries;
+                discard_from_mysql_buffer();
+
                 //        XXXXXX*XXXXXXX
                 //        XXXXXXX*XXXXXX
 
@@ -115,8 +115,7 @@ bool store_in_mysql_buffer(const struct device_sensor_state *state)
         return true;
 }
 
-bool pop_from_mysql_buffer(struct device_sensor_state *state)
-{
+bool peek_from_mysql_buffer(struct device_sensor_state *state) {
         if (mysql_buffer_max_entries == 0) {
                 return false;
         }
@@ -125,6 +124,17 @@ bool pop_from_mysql_buffer(struct device_sensor_state *state)
         }
 
         memcpy(state, &mysql_buffer[pop_position], sizeof(*state));
+        return true;
+}
+
+bool discard_from_mysql_buffer()
+{
+        if (mysql_buffer_max_entries == 0) {
+                return false;
+        }
+        if (entries_in_buffer == 0) {
+                return false;
+        }
         pop_position = (pop_position+1) % mysql_buffer_max_entries;
         //        00000*XXXXX000
         //        000000XXXXX000
@@ -133,6 +143,11 @@ bool pop_from_mysql_buffer(struct device_sensor_state *state)
         assert_internal_state();
 
         return true;
+}
+
+bool pop_from_mysql_buffer(struct device_sensor_state *state)
+{
+        return peek_from_mysql_buffer(state) && discard_from_mysql_buffer();
 }
 
 long get_mysql_buffer_count()

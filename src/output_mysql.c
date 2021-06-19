@@ -166,15 +166,16 @@ bool store_sensor_state_mysql(const struct device_sensor_state *state)
         while (get_mysql_buffer_count() > 0) {
                 struct device_sensor_state state;
 
-                if (!pop_from_mysql_buffer(&state)) {
+                if (!peek_from_mysql_buffer(&state)) {
                         break;
                 }
 
-                // TODO: separate pop into peek and discard
-                if (! store_sensor_state_mysql_real(&state)) {
-                        store_in_mysql_buffer(&state);
-                        return false;
+                if (store_sensor_state_mysql_real(&state)) {
+                        discard_from_mysql_buffer();
+                } else {
+                        break;
                 }
         }
+
         return true;
 }

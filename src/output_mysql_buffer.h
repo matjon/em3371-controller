@@ -26,5 +26,10 @@ bool init_mysql_buffer(size_t buffer_size);
 void shutdown_mysql_buffer();
 
 bool store_in_mysql_buffer(const struct device_sensor_state *state);
+
+bool peek_from_mysql_buffer(struct device_sensor_state *state);
+bool discard_from_mysql_buffer();
+
 bool pop_from_mysql_buffer(struct device_sensor_state *state);
+
 long get_mysql_buffer_count();
