@@ -324,6 +324,12 @@ void handle_decoded_sensor_state(const struct device_sensor_state *sensor_state,
                 display_sensor_state_sql(sensor_state);
         }
         update_status_file(options->status_file_path, sensor_state);
+
+#ifdef HAVE_MYSQL
+        if (options->mysql_server != NULL) {
+                store_sensor_state_mysql(sensor_state);
+        }
+#endif
 }
 
 static void on_interrupt(int signum)

@@ -22,3 +22,4 @@
 #include "main.h"
 
 bool init_mysql_output();
+bool store_sensor_state_mysql(const struct device_sensor_state *state);
