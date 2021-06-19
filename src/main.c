@@ -374,6 +374,28 @@ static void init_signals()
         INSTALL_SIGNAL(SIGINT)
 }
 
+
+void print_help(FILE *stream, char *argv0)
+{
+
+fprintf(stream, "%s: A program to capture data from some\n"
+        "\tLivingSense-compatible weather stations\n\n"
+        "Parameters:\n"
+        "\t-a, --bind-address\n"
+        "\t\tIPv4 address to listen on. By default this program listens on all network\n"
+        "\t\tinterfaces. If the program is being run on a device with a public IP address\n"
+        "\t\t(a device that is directly accessible from the Internet), use this option to\n"
+        "\t\tdo not allow public access to this program. In this case, the value of this\n"
+        "\t\tparameter should be a private IP address of the computer this program is\n"
+        "\t\tbeing run on, for example 192.168.12.22.\n"
+        "\n"
+        "\t-p, --port\n"
+        "\t\tport number this software should listen on. Should be equal to the one\n"
+        "\t\tconfigured in weather station settings. By default %d.\n"
+        , argv0, DEFAULT_BIND_PORT);
+#warning unfinished
+}
+
 static void parse_program_options(const int argc, char **argv,
                 struct program_options *options)
 {
@@ -392,6 +414,7 @@ static void parse_program_options(const int argc, char **argv,
                 { "mysql-database", required_argument, NULL, 'v' },
                 { "mysql-buffer-size", required_argument, NULL, 'u' },
                 { "inject",       no_argument,       NULL, 'i' },
+                { "help",         no_argument,       NULL, 'h' },
                 {0, 0, 0, 0}
         };
 
@@ -421,7 +444,7 @@ static void parse_program_options(const int argc, char **argv,
                 long port_number = 0;
                 long buffer_size = 0;
 
-                ret = getopt_long (argc, argv, "a:p:rs:", long_options, &option_index);
+                ret = getopt_long (argc, argv, "a:p:rs:h", long_options, &option_index);
                 if (ret == -1) {
                         break;
                 }
@@ -524,6 +547,11 @@ static void parse_program_options(const int argc, char **argv,
                         exit(1);
                         break;
 #endif
+
+                case 'h':
+                        print_help(stderr, argv[0]);
+                        exit(1);
+                        break;
                 case 'i':
                         options->allow_injecting_packets = true;
                         break;

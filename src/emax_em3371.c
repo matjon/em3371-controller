@@ -376,6 +376,7 @@ bool decode_hex(const char *buffer, unsigned char *out) {
 static bool inject_packets(int udp_socket, const struct sockaddr_in *packet_source)
 {
         char hex_buffer[200];
+#warning mixing read and fread may cause trouble (see "man stderr")
         char *ret = fgets(hex_buffer, sizeof(hex_buffer), stdin);
         if (ret == NULL) {
                 if (errno == EAGAIN || errno == EWOULDBLOCK) {
