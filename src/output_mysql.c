@@ -76,6 +76,9 @@ bool init_mysql_output(struct program_options *options)
         mysql_password = options->mysql_password;
         mysql_database = options->mysql_database;
 
+        mysql_ptr = NULL;
+        mysql_connected=false;
+
         mysql_try_connect();
         return true;
 }
