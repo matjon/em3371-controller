@@ -442,7 +442,6 @@ static void parse_program_options(const int argc, char **argv,
                 int option_index = 0;
                 char *endptr = NULL;
                 long port_number = 0;
-                long buffer_size = 0;
 
                 ret = getopt_long (argc, argv, "a:p:rs:h", long_options, &option_index);
                 if (ret == -1) {
@@ -521,7 +520,7 @@ static void parse_program_options(const int argc, char **argv,
                         break;
                 case 'u':
                         endptr = NULL;
-                        buffer_size = strtol(optarg, &endptr, 10);
+                        long buffer_size = strtol(optarg, &endptr, 10);
                         if (*endptr != 0) {
                                 fputs("Incorrect MySQL buffer size specified on command line!\n",
                                                 stderr);
