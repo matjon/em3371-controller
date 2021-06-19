@@ -32,12 +32,20 @@ static const char *mysql_password;
 static const char *mysql_database;
 static bool mysql_connected=false;
 
-static bool mysql_try_connect()
+
+bool shutdown_mysql_output()
 {
         if (mysql_ptr != NULL) {
                 mysql_close(mysql_ptr);
                 mysql_ptr = NULL;
         }
+        mysql_connected = false;
+        return true;
+}
+
+static bool mysql_try_connect()
+{
+        shutdown_mysql_output();
 
         mysql_ptr = mysql_init(NULL);
         if (mysql_ptr == NULL) {
@@ -79,7 +87,6 @@ bool init_mysql_output(struct program_options *options)
         mysql_ptr = NULL;
         mysql_connected=false;
 
-        mysql_try_connect();
         return true;
 }
 
