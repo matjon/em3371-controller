@@ -313,9 +313,7 @@ static void shutdown_logging()
         shutdown_CSV_output();
 
 #ifdef HAVE_MYSQL
-        if (options->mysql_server != NULL) {
-                shutdown_mysql_output();
-        }
+        shutdown_mysql_output();
 #endif
 }
 
