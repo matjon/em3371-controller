@@ -151,11 +151,13 @@ static void initialize_timezone()
 	tzset();
 }
 
-void tm_to_string(const struct tm *time_tm, char *time_out,
+void time_to_string(const time_t time_in, char *time_out,
                 const size_t buffer_size)
 {
+        struct tm time_tm;
+        localtime_r(&time_in, &time_tm);
 	// Time should be in a format that LibreOffice is able to understand
-	strftime(time_out, buffer_size, "%Y-%m-%d %H:%M:%S", time_tm);
+	strftime(time_out, buffer_size, "%Y-%m-%d %H:%M:%S", &time_tm);
 }
 
 // Displays current time converted to a string - either local time or time in
@@ -173,7 +175,9 @@ void current_time_to_string(char *time_out, const size_t buffer_size,
                 gmtime_r(&current_time, &current_time_tm);
         }
 
-        tm_to_string(&current_time_tm, time_out, buffer_size);
+        // TODO: remove duplicated code
+	// Time should be in a format that LibreOffice is able to understand
+	strftime(time_out, buffer_size, "%Y-%m-%d %H:%M:%S", &current_time_tm);
 }
 
 

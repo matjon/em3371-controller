@@ -213,7 +213,7 @@ void get_sensor_state_sql(
 	current_time_to_string(current_time, sizeof(current_time), false);
 
 	char device_time_str[30];
-	tm_to_string(&(state->device_time), device_time_str, sizeof(device_time_str));
+	time_to_string(state->device_time, device_time_str, sizeof(device_time_str));
 
 // TODO: Grafana really requires time stored in the database to be in UTC timezone:
 //

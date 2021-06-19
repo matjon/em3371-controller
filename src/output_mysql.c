@@ -125,7 +125,7 @@ bool store_sensor_state_mysql(const struct device_sensor_state *state)
 
         if (! output_mysql_execute_statement("START TRANSACTION")) {
                 // If we are not able to start a transaction, something is
-                // not right. Try to reconnect.
+                // not right. Perhaps the connection was lost. Try to reconnect.
                 if (!mysql_try_connect() ||
                         ! output_mysql_execute_statement("START TRANSACTION")) {
                         goto out;

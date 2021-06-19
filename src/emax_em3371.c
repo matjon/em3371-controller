@@ -175,14 +175,16 @@ static void decode_device_time(struct device_sensor_state *state,
                 return;
         }
 
-        memset(&(state->device_time), 0, sizeof(state->device_time));
-        state->device_time.tm_sec = received_packet[0x13] / 2;
-        state->device_time.tm_min = received_packet[0x12];
-        state->device_time.tm_hour = received_packet[0x11];
-        state->device_time.tm_mday = received_packet[0x10];
-        state->device_time.tm_mon = received_packet[0x0f]-1;
-        state->device_time.tm_year = received_packet[0x0e]+100;
-        state->device_time.tm_isdst = -1; // information not available
+        struct tm device_time_tm;
+
+        memset(&device_time_tm, 0, sizeof(struct tm));
+        device_time_tm.tm_sec = received_packet[0x13] / 2;
+        device_time_tm.tm_min = received_packet[0x12];
+        device_time_tm.tm_hour = received_packet[0x11];
+        device_time_tm.tm_mday = received_packet[0x10];
+        device_time_tm.tm_mon = received_packet[0x0f]-1;
+        device_time_tm.tm_year = received_packet[0x0e]+100;
+        device_time_tm.tm_isdst = -1; // information not available
 
 
         // I received a date "2020-12-15 10:60:00" instead of the expected
@@ -195,11 +197,11 @@ static void decode_device_time(struct device_sensor_state *state,
         // second, which would be an error (the weather station most probably
         // does not handle leap seconds).
         // Therefore I'm correcting it here manually.
-        if (state->device_time.tm_sec >= 60) {
-                state->device_time.tm_min++;
-                state->device_time.tm_sec -= 60;
+        if (device_time_tm.tm_sec >= 60) {
+                device_time_tm.tm_min++;
+                device_time_tm.tm_sec -= 60;
         }
-        mktime(&state->device_time);
+        state->device_time = mktime(&device_time_tm);
 }
 
 static void decode_sensor_state(struct device_sensor_state *state, const unsigned char *received_packet,

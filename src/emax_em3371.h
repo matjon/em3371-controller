@@ -66,7 +66,8 @@ struct device_sensor_state {
         // Testing: byte 0x31 of payload may contain atmospheric pressure trend.
         unsigned char payload_byte_0x31;
 
-        struct tm device_time;
+        time_t device_time;
+        // TODO: device_timezone
 };
 #define DEVICE_INCORRECT_PRESSURE UINT16_MAX
 

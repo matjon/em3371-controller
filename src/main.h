@@ -53,8 +53,9 @@ struct program_options {
 };
 #define DEFAULT_BIND_PORT 17000
 
-void tm_to_string(const struct tm *time_tm, char *time_out,
+void time_to_string(const time_t time_in, char *time_out,
                 const size_t buffer_size);
+
 void current_time_to_string(char *time_out, const size_t buffer_size, bool apply_timezone);
 
 bool open_output_file(const char *output_path, FILE **output_stream,
