@@ -286,7 +286,8 @@ static bool send_timesync_packet(int udp_socket, const struct sockaddr_in *packe
 {
         if (received_packet_size <= 8) {
                 // TODO: print a warning message
-                return;
+                fputs("Error in send_timesync_packet: received_packet_size too small\n", stderr);
+                return false;
         }
 
         unsigned char buffer[22];
