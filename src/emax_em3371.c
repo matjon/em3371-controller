@@ -316,8 +316,11 @@ static bool send_timesync_packet(int udp_socket, const struct sockaddr_in *packe
         struct tm current_time_tm;
         localtime_r(&current_time, &current_time_tm);
 
-        if (current_time_tm.tm_year < 2000) {
+        if (current_time_tm.tm_year < 2010 - 1900) {
                 // Device date appears not to be set.
+                fprintf(stderr,
+                        "Device date appears not to be set, current year is %d\n",
+                        current_time_tm.tm_year + 1900);
                 return false;
         }
 
