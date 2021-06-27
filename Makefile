@@ -14,7 +14,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-all: emax_em3371_decoder psychrometrics_test
+all: em3371-controller psychrometrics_test
 
 MAIN_DEPENDENCIES = src/main.o src/emax_em3371.o src/psychrometrics.o 	\
 		    src/output_json.o src/output_csv.o src/output_sql.o	\
@@ -35,7 +35,7 @@ else
 	DEPENDENCIES = $(MAIN_DEPENDENCIES)
 endif
 
-emax_em3371_decoder: $(DEPENDENCIES)
+em3371-controller: $(DEPENDENCIES)
 	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS) $(LOADLIBES)
 
 psychrometrics_test: $(PSYCH_TEST_DEPS)
@@ -52,4 +52,4 @@ DEP_FILES := $(ALL_DEPS:.o=.d)
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 clean:
-	-rm emax_em3371_decoder psychrometrics_test src/*.o src/*.d
+	-rm em3371-controller psychrometrics_test $(ALL_DEPS) $(DEP_FILES)
