@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <mysql/mysql.h>
+#include <mysql.h>
 
 static MYSQL * mysql_ptr = NULL;
 
